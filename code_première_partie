@@ -1,1 +1,169 @@
+---
+title: "SAE5.EMS.01"
+author: "SA"
+date: "2025-10-06"
+output: word_document
+---
+
+# Chargement bibliothèques
+```{r}
+suppressPackageStartupMessages(library(openxlsx))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(FactoMineR))
+```
+
+# Importation des données
+```{r}
+electricite = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/acces_electricite.xlsx", sheet="Data", startRow=4)
+agriculture = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/agriculture.xlsx", sheet="Data", startRow=4)
+chomage = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/chomage_total.xlsx", sheet="Data", startRow=4)
+energie_renouv = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/conso_energie_renouv.xlsx", sheet="Data", startRow=4)
+croissance_pib = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/croissance_PIB.xlsx", sheet="Data", startRow=4)
+croissance_pop = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/croissance_population.xlsx", sheet="Data", startRow=4)
+dep_militaire = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/depenses_militaires.xlsx", sheet="Data", startRow=4)
+esperance_vie = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/esperance_vie.xlsx", sheet="Data", startRow=4)
+surface_fores = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/esperance_vie.xlsx", sheet="Data", startRow=4)
+taux_mort_inf = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/taux_mortalite_infantile.xlsx", sheet="Data", startRow=4)
+```
+
+Test de bonne implantation
+```{r}
+str(electricite)
+str(agriculture)
+str(chomage)
+str(energie_renouv)
+str(croissance_pib)
+str(croissance_pop)
+str(dep_militaire)
+str(esperance_vie)
+str(surface_fores)
+str(taux_mort_inf)
+```
+
+# Nettoyage : récupération de la dérnière année où la valeur est connue
+
+Pour l'accès à l'électricité (%de la population)
+```{r}
+electricite_a=electricite$'2024' # data_a est un vecteur
+n=length(electricite_a)
+p=ncol(electricite)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(electricite_a[i])) electricite_a[i]=electricite[i,annee]
+sum(is.na(electricite_a)) # nombre de lignes à donnée manquante
+```
+
+Pour l'Agriculture, valeur ajouté (%du PIB)
+```{r}
+agriculture_a=agriculture$'2024' # data_a est un vecteur
+n=length(agriculture_a)
+p=ncol(agriculture)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(agriculture_a[i])) agriculture_a[i]=agriculture[i,annee]
+sum(is.na(agriculture_a)) # nombre de lignes à donnée manquante
+```
+
+Pour le Chômage totale (% de la population) (estimation modélisée OIT) 
+```{r}
+chomage_a=chomage$'2024' # data_a est un vecteur
+n=length(chomage_a)
+p=ncol(chomage)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(chomage_a[i])) chomage_a[i]=chomage[i,annee]
+sum(is.na(chomage_a)) # nombre de lignes à donnée manquante
+```
+
+Pour la Croissance de la population (%annuel): 
+```{r}
+croissance_pop_a=croissance_pop$'2024' # data_a est un vecteur
+n=length(croissance_pop_a)
+p=ncol(croissance_pop)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(croissance_pop_a[i])) croissance_pop_a[i]=croissance_pop[i,annee]
+sum(is.na(croissance_pop_a)) # nombre de lignes à donnée manquante
+```
+
+Pour la Croissance du PIB par habitant (%annuel): 
+```{r}
+croissance_pib_a=croissance_pib$'2024' # data_a est un vecteur
+n=length(croissance_pib_a)
+p=ncol(croissance_pib)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(croissance_pib_a[i])) croissance_pib_a[i]=croissance_pib[i,annee]
+sum(is.na(croissance_pib_a)) # nombre de lignes à donnée manquante
+```
+
+Pour les Dépenses militaires(% du PIB)
+```{r}
+dep_militaire_a=dep_militaire$'2024' # data_a est un vecteur
+n=length(dep_militaire_a)
+p=ncol(dep_militaire)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(dep_militaire_a[i])) dep_militaire_a[i]=dep_militaire[i,annee]
+sum(is.na(dep_militaire_a)) # nombre de lignes à donnée manquante
+```
+
+Pour la consommation d’energie renouvelable(% de la consommation total d’energie):
+```{r}
+energie_renouv_a=energie_renouv$'2024' # data_a est un vecteur
+n=length(energie_renouv_a)
+p=ncol(energie_renouv)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(energie_renouv_a[i])) energie_renouv_a[i]=energie_renouv[i,annee]
+sum(is.na(energie_renouv_a)) # nombre de lignes à donnée manquante
+```
+
+Pour l'Espérance de vie à la naissance, total (année)
+```{r}
+esperance_vie_a=esperance_vie$'2024' # data_a est un vecteur
+n=length(esperance_vie_a)
+p=ncol(esperance_vie)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(esperance_vie_a[i])) esperance_vie_a[i]=esperance_vie[i,annee]
+sum(is.na(esperance_vie_a)) # nombre de lignes à donnée manquante
+```
+
+Pour les surfaces forestières (% du territoire) : 
+```{r}
+surface_fores_a=surface_fores$'2024' # data_a est un vecteur
+n=length(surface_fores_a)
+p=ncol(surface_fores)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(surface_fores_a[i])) surface_fores_a[i]=surface_fores[i,annee]
+sum(is.na(surface_fores_a)) # nombre de lignes à donnée manquante
+```
+
+Pour le Taux de mortalité infantile moins de 5 ans (pour 1000 naissance)
+```{r}
+taux_mort_inf_a=taux_mort_inf$'2024' # data_a est un vecteur
+n=length(taux_mort_inf_a)
+p=ncol(taux_mort_inf)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(taux_mort_inf_a[i])) taux_mort_inf_a[i]=taux_mort_inf[i,annee]
+sum(is.na(taux_mort_inf_a)) # nombre de lignes à donnée manquante
+```
+
+
+# Construction de la table de données
+```{r}
+data_t=data.frame(pays=electricite$Country.Name, ISO=electricite$Country.Code, electricite=electricite_a,agriculture=agriculture_a,chomage=chomage_a,croissance_pib=croissance_pib_a,croissance_pop=croissance_pop_a,dep_militaire=dep_militaire_a,energie_renouv=energie_renouv_a,esperance_vie=esperance_vie_a,surface_fores=surface_fores_a,taux_mort_inf=taux_mort_inf_a)
+```
+
+# Importation de la carte monde
+```{r}
+monde <- st_read("U:/Documents/S5/SAE5.EMS.01-Application statistique/monde.shp") # nécessite la bibliothèque sf
+head(monde)
+dim(monde)
+```
+# ISO 3, ca va etre notre code
+# longitude et latitude represente le centroïde du pays
+
+Fusion des données importantes à celle de la carte
+```{r}
+monde_data <- left_join(monde, data_t, by=c("ISO3" = "ISO"))
+head(monde_data)
+dim(monde)
+dim(monde_data)
+```
 
