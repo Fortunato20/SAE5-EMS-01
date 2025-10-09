@@ -16,16 +16,16 @@ suppressPackageStartupMessages(library(FactoMineR))
 
 # Importation des données
 ```{r}
-electricite = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/acces_electricite.xlsx", sheet="Data", startRow=4)
-agriculture = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/agriculture.xlsx", sheet="Data", startRow=4)
-chomage = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/chomage_total.xlsx", sheet="Data", startRow=4)
-energie_renouv = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/conso_energie_renouv.xlsx", sheet="Data", startRow=4)
-croissance_pib = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/croissance_PIB.xlsx", sheet="Data", startRow=4)
-croissance_pop = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/croissance_population.xlsx", sheet="Data", startRow=4)
-dep_militaire = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/depenses_militaires.xlsx", sheet="Data", startRow=4)
-esperance_vie = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/esperance_vie.xlsx", sheet="Data", startRow=4)
-surface_fores = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/esperance_vie.xlsx", sheet="Data", startRow=4)
-taux_mort_inf = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/taux_mortalite_infantile.xlsx", sheet="Data", startRow=4)
+electricite = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/acces_electricite.xlsx", sheet="Data", startRow=4)
+agriculture = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/agriculture.xlsx", sheet="Data", startRow=4)
+chomage = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/chomage_total.xlsx", sheet="Data", startRow=4)
+energie_renouv = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/conso_energie_renouv.xlsx", sheet="Data", startRow=4)
+croissance_pib = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/croissance_PIB.xlsx", sheet="Data", startRow=4)
+croissance_pop = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/croissance_population.xlsx", sheet="Data", startRow=4)
+dep_militaire = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/depenses_militaires.xlsx", sheet="Data", startRow=4)
+esperance_vie = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/esperance_vie.xlsx", sheet="Data", startRow=4)
+surface_fores = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/esperance_vie.xlsx", sheet="Data", startRow=4)
+taux_mort_inf = openxlsx::read.xlsx("C:/Users/33749/OneDrive/Documents/Saïnel/SAE5.EMS.01-Application statistique/taux_mortalite_infantile.xlsx", sheet="Data", startRow=4)
 ```
 
 Test de bonne implantation
@@ -148,7 +148,89 @@ sum(is.na(taux_mort_inf_a)) # nombre de lignes à donnée manquante
 # Construction de la table de données
 ```{r}
 data_t=data.frame(pays=electricite$Country.Name, ISO=electricite$Country.Code, electricite=electricite_a,agriculture=agriculture_a,chomage=chomage_a,croissance_pib=croissance_pib_a,croissance_pop=croissance_pop_a,dep_militaire=dep_militaire_a,energie_renouv=energie_renouv_a,esperance_vie=esperance_vie_a,surface_fores=surface_fores_a,taux_mort_inf=taux_mort_inf_a)
+nrow(data_t)
+data_t <- na.omit(data_t)
+nrow(data_t)
 ```
+
+
+# Statistiques descriptives de base
+```{r}
+summary(data_t) # Aperçu global
+# Sélectionner uniquement les colonnes numériques
+data_num <- data_t[, sapply(data_t, is.numeric)]
+
+# Calculer les statistiques descriptives
+stats_desc <- data.frame(
+  Moyenne = sapply(data_num, mean, na.rm = TRUE),
+  Médiane = sapply(data_num, median, na.rm = TRUE),
+  Écart_type = sapply(data_num, sd, na.rm = TRUE),
+  Minimum = sapply(data_num, min, na.rm = TRUE),
+  Maximum = sapply(data_num, max, na.rm = TRUE)
+)
+
+# Afficher le tableau
+print(stats_desc)
+write.csv(stats_desc, file = "statistiques_descriptives.csv", row.names = TRUE)
+```
+
+# QUelques graphiques simples 
+
+# Histogramme des variables numériques
+on met pas tous les histogrammes dans le rapport, on en choisit 2 ou 3 seulement
+```{r}
+for (var in names(data_num)) {
+  hist(data_num[[var]],
+       main = paste("Histogramme de", var),
+       xlab = var,
+       ylab = "Effectif",
+       col = "skyblue", border = "white")
+}
+```
+
+# Boîtes à moustaches comparatives
+```{r}
+boxplot(data_num, main = "Comparaison des distributions",
+        las = 2, col = "lightgreen")
+```
+
+# Matrice de corrélation
+```{r}
+library(corrplot)
+cor_matrix <- cor(data_num, use = "complete.obs")
+corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.8)
+```
+
+# Nuages de points (relations pertinentes)
+```{r}
+# Espérance de vie vs Électricité
+plot(data_num$electricite, data_num$esperance_vie,
+     xlab = "Accès à l'électricité (%)", ylab = "Espérance de vie (années)",
+     main = "Lien entre électricité et espérance de vie",
+     pch = 19, col = "blue")
+
+# Croissance du PIB vs Chômage
+plot(data_num$croissance_pib, data_num$chomage,
+     xlab = "Croissance du PIB (%)", ylab = "Taux de chômage (%)",
+     main = "Croissance du PIB et chômage",
+     pch = 19, col = "darkred")
+```
+
+Commentaire : 
+- Ces deux variables sont souvent liées au niveau de développement d’un pays.
+Plus la population a accès à l’électricité, plus cela reflète de bonnes infrastructures, un meilleur accès aux soins, à l’eau potable, à la technologie, etc.
+Ces facteurs influencent directement l’espérance de vie.
+
+- Ces deux indicateurs décrivent la santé économique d’un pays (chomage et Croissance du PIB)
+
+
+
+
+
+#---------------Fin du rapport 1--------------------------------
+
+
+
 
 # Importation de la carte monde
 ```{r}
@@ -166,4 +248,3 @@ head(monde_data)
 dim(monde)
 dim(monde_data)
 ```
-
