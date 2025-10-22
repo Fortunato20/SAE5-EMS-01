@@ -1,0 +1,640 @@
+---
+title: "SAE5.EMS.01"
+author: "SA"
+date: "2025-10-06"
+output: word_document
+---
+
+# Chargement bibliothèques
+```{r}
+suppressPackageStartupMessages(library(openxlsx))
+suppressPackageStartupMessages(library(writexl))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(FactoMineR))
+suppressPackageStartupMessages(library(WriteXLS))
+suppressPackageStartupMessages(library(GGally))
+suppressPackageStartupMessages(library(factoextra))
+suppressPackageStartupMessages(library(leaflet))
+suppressPackageStartupMessages(library(htmlwidgets))
+```
+
+# Importation des données
+```{r}
+# "C:/Users/33749/OneDrive/Documents/SAE5.EMS.01-Application statistique/monde.shp"
+electricite = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/acces_electricite.xlsx", sheet="Data", startRow=4)
+agriculture = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/agriculture.xlsx", sheet="Data", startRow=4)
+precipitations = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/haut_moy_precip.xlsx", sheet="Data", startRow=4)
+energie_renouv = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/conso_energie_renouv.xlsx", sheet="Data", startRow=4)
+croissance_pib = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/croissance_PIB.xlsx", sheet="Data", startRow=4)
+croissance_pop = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/croissance_population.xlsx", sheet="Data", startRow=4)
+emissions_co2 = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/emissions_co2.xlsx", sheet="Data", startRow=4)
+esperance_vie = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/esperance_vie.xlsx", sheet="Data", startRow=4)
+surface_fores = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/esperance_vie.xlsx", sheet="Data", startRow=4)
+taux_mort_inf = openxlsx::read.xlsx("U:/Documents/S5/SAE5.EMS.01-Application statistique/taux_mortalite_infantile.xlsx", sheet="Data", startRow=4)
+```
+
+
+Test de bonne implantation
+```{r}
+str(electricite)
+str(agriculture)
+str(precipitations)
+str(energie_renouv)
+str(croissance_pib)
+str(croissance_pop)
+str(emissions_co2)
+str(esperance_vie)
+str(surface_fores)
+str(taux_mort_inf)
+```
+
+# Nettoyage : récupération de la dérnière année où la valeur est connue
+
+Pour l'accès à l'électricité (%de la population)
+```{r}
+electricite_a=electricite$'2022' # data_a est un vecteur
+n=length(electricite_a)
+p=ncol(electricite)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(electricite_a[i])) electricite_a[i]=electricite[i,annee]
+sum(is.na(electricite_a)) # nombre de lignes à donnée manquante
+```
+
+Pour l'Agriculture, valeur ajouté (%du PIB)
+```{r}
+agriculture_a=agriculture$'2022' # data_a est un vecteur
+n=length(agriculture_a)
+p=ncol(agriculture)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(agriculture_a[i])) agriculture_a[i]=agriculture[i,annee]
+sum(is.na(agriculture_a)) # nombre de lignes à donnée manquante
+```
+
+Hauteur moyenne des precipitations (en mm) 
+```{r}
+precipitations_a=precipitations$'2022' # data_a est un vecteur
+n=length(precipitations_a)
+p=ncol(precipitations)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(precipitations_a[i])) precipitations_a[i]=precipitations[i,annee]
+sum(is.na(precipitations_a)) # nombre de lignes à donnée manquante
+```
+
+Pour la Croissance de la population (%annuel): 
+```{r}
+croissance_pop_a=croissance_pop$'2022' # data_a est un vecteur
+n=length(croissance_pop_a)
+p=ncol(croissance_pop)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(croissance_pop_a[i])) croissance_pop_a[i]=croissance_pop[i,annee]
+sum(is.na(croissance_pop_a)) # nombre de lignes à donnée manquante
+```
+
+Pour la Croissance du PIB par habitant (%annuel): 
+```{r}
+croissance_pib_a=croissance_pib$'2022' # data_a est un vecteur
+n=length(croissance_pib_a)
+p=ncol(croissance_pib)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(croissance_pib_a[i])) croissance_pib_a[i]=croissance_pib[i,annee]
+sum(is.na(croissance_pib_a)) # nombre de lignes à donnée manquante
+```
+
+Pour les Emissions de CO2 total
+```{r}
+emissions_co2_a=emissions_co2$'2022' # data_a est un vecteur
+n=length(emissions_co2_a)
+p=ncol(emissions_co2)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(emissions_co2_a[i])) emissions_co2_a[i]=emissions_co2[i,annee]
+sum(is.na(emissions_co2_a)) # nombre de lignes à donnée manquante
+```
+
+Pour la consommation d’energie renouvelable(% de la consommation total d’energie):
+```{r}
+energie_renouv_a=energie_renouv$'2022' # data_a est un vecteur
+n=length(energie_renouv_a)
+p=ncol(energie_renouv)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(energie_renouv_a[i])) energie_renouv_a[i]=energie_renouv[i,annee]
+sum(is.na(energie_renouv_a)) # nombre de lignes à donnée manquante
+```
+
+Pour l'Espérance de vie à la naissance, total (année)
+```{r}
+esperance_vie_a=esperance_vie$'2022' # data_a est un vecteur
+n=length(esperance_vie_a)
+p=ncol(esperance_vie)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(esperance_vie_a[i])) esperance_vie_a[i]=esperance_vie[i,annee]
+sum(is.na(esperance_vie_a)) # nombre de lignes à donnée manquante
+```
+
+Pour les surfaces forestières (% du territoire) : 
+```{r}
+surface_fores_a=surface_fores$'2022' # data_a est un vecteur
+n=length(surface_fores_a)
+p=ncol(surface_fores)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(surface_fores_a[i])) surface_fores_a[i]=surface_fores[i,annee]
+sum(is.na(surface_fores_a)) # nombre de lignes à donnée manquante
+```
+
+Pour le Taux de mortalité infantile moins de 5 ans (pour 1000 naissance)
+```{r}
+taux_mort_inf_a=taux_mort_inf$'2022' # data_a est un vecteur
+n=length(taux_mort_inf_a)
+p=ncol(taux_mort_inf)
+for (annee in p:5)
+  for (i in 1:n) if (is.na(taux_mort_inf_a[i])) taux_mort_inf_a[i]=taux_mort_inf[i,annee]
+sum(is.na(taux_mort_inf_a)) # nombre de lignes à donnée manquante
+```
+
+# Construction de la table de données
+```{r}
+data_t=data.frame(pays=electricite$Country.Name, ISO=electricite$Country.Code, electricite=electricite_a,agriculture=agriculture_a,precipitations=precipitations_a,croissance_pib=croissance_pib_a,croissance_pop=croissance_pop_a,emissions_co2=emissions_co2_a,energie_renouv=energie_renouv_a,esperance_vie=esperance_vie_a,surface_fores=surface_fores_a,taux_mort_inf=taux_mort_inf_a)
+nrow(data_t)
+data_t <- na.omit(data_t)
+nrow(data_t)
+write.xlsx(data_t, file = "U:/Documents/S5/SAE5.EMS.01-Application statistique/data_t.xlsx", rownames=TRUE)
+```
+
+```{r}
+# install.packages(c("readxl","dplyr","janitor","writexl","countrycode"))
+library(readxl)
+library(dplyr)
+library(janitor)
+library(writexl)
+library(countrycode)
+
+# --------- Fichiers ---------
+data_t_file    <- "data_t.xlsx"
+disasters_file <- "disasters_natural_par_pays_annee.xlsx"
+output_file    <- "data_t_avec_catastrophes_2022.xlsx"
+
+# --------- Lecture et nettoyage ---------
+data_t <- read_excel(data_t_file, sheet = 1) %>% clean_names()
+disasters <- read_excel(disasters_file, sheet = 1) %>% clean_names()
+
+message("Colonnes data_t : ", paste(names(data_t), collapse = " | "))
+message("Colonnes disasters : ", paste(names(disasters), collapse = " | "))
+
+# --------- 1) Identifier / normaliser ISO dans data_t ---------
+iso_candidates <- c("iso", "iso3", "iso3c", "code", "country_code")
+iso_col <- intersect(iso_candidates, names(data_t)) %>% first()
+
+if (!is.null(iso_col)) {
+  data_t <- data_t %>% rename(ISO = all_of(iso_col))
+  message("Colonne ISO trouvée et renommée en 'ISO' : ", iso_col)
+} else {
+  country_candidates <- c("pays", "country", "country_name", "nom_pays")
+  country_col <- intersect(country_candidates, names(data_t)) %>% first()
+  if (is.null(country_col)) {
+    # fallback : première colonne texte
+    txt_cols <- names(data_t)[sapply(data_t, is.character)]
+    if (length(txt_cols) == 0) stop("Aucune colonne texte trouvée pour convertir en ISO.")
+    country_col <- txt_cols[1]
+    message("Aucun nom explicite trouvé ; utilisation de la colonne texte : ", country_col)
+  }
+  data_t <- data_t %>% rename(country_for_iso = all_of(country_col))
+  data_t <- data_t %>%
+    mutate(ISO = countrycode(country_for_iso, origin = "country.name", destination = "iso3c"))
+  n_na_iso <- sum(is.na(data_t$ISO))
+  message("Conversion country -> ISO (iso3c) réalisée ; NAs = ", n_na_iso)
+}
+
+# Uniformiser ISO en majuscules
+data_t <- data_t %>% mutate(ISO = toupper(as.character(ISO)))
+
+# --------- 2) Repérer les colonnes 2022 et 2021 dans disasters ---------
+year_2022_col <- names(disasters)[grepl("(^|\\D)2022(\\D|$)", names(disasters))] %>% first()
+year_2021_col <- names(disasters)[grepl("(^|\\D)2021(\\D|$)", names(disasters))] %>% first()
+
+if (is.null(year_2022_col)) stop("Colonne 2022 introuvable dans le fichier 'disasters'. Vérifie les en-têtes.")
+if (is.null(year_2021_col)) {
+  message("Colonne 2021 introuvable : le fallback prendra une valeur NA quand 2022 est manquante.")
+} else {
+  message("Colonnes trouvées : 2022 -> '", year_2022_col, "', 2021 -> '", year_2021_col, "'")
+}
+
+# --------- 3) Identifier ou créer colonne ISO dans disasters ---------
+d_iso_candidates <- c("iso", "iso3", "iso3c", "country_code")
+d_iso_col <- intersect(d_iso_candidates, names(disasters)) %>% first()
+if (is.null(d_iso_col)) {
+  if ("country" %in% names(disasters)) {
+    disasters <- disasters %>%
+      mutate(ISO = countrycode(country, origin = "country.name", destination = "iso3c"))
+    d_iso_col <- "ISO"
+    message("Pas d'ISO explicite dans disasters : conversion depuis 'country' effectuée.")
+  } else {
+    stop("Impossible de trouver une colonne ISO ou Country dans 'disasters'.")
+  }
+} else {
+  disasters <- disasters %>% rename(ISO = all_of(d_iso_col))
+}
+
+# Uniformiser ISO en majuscules
+disasters <- disasters %>% mutate(ISO = toupper(as.character(ISO)))
+
+# --------- 4) Construire le tableau des catastrophes 2022 avec fallback 2021 ---------
+disasters_2022 <- disasters %>%
+  mutate(
+    annee_2022 = as.numeric(.data[[year_2022_col]]),
+    annee_2021 = if (!is.null(year_2021_col)) as.numeric(.data[[year_2021_col]]) else NA_real_,
+    nb_cata_naturelles = coalesce(annee_2022, annee_2021)
+  ) %>%
+  select(ISO, nb_cata_naturelles)
+
+# --------- 5) Jointure sur ISO avec data_t ---------
+disasters_2022 <- disasters_2022 %>% mutate(ISO = toupper(as.character(ISO)))
+result <- data_t %>% left_join(disasters_2022, by = "ISO")
+
+# --------- 6) Rapport : combien de NA restants ? ---------
+nb_na <- sum(is.na(result$nb_cata_naturelles))
+message("Nombre de lignes sans valeur pour catastrophes_naturelles_2022 après fallback : ", nb_na)
+
+# --------- 7) Sauvegarde ---------
+orig_cols <- names(data_t)
+new_cols <- setdiff(names(result), orig_cols)
+result <- result %>% select(all_of(orig_cols), all_of(new_cols))
+
+write_xlsx(result, output_file)
+message("résultat sauvegardé dans : ", output_file)
+
+```
+```{r}
+library(readxl)
+
+data_t<- read_excel("data_t_avec_catastrophes_2022.xlsx")
+head(data_t,10)
+```
+
+
+# Statistiques descriptives de base
+```{r}
+summary(data_t) # Aperçu global
+# Sélectionner uniquement les colonnes numériques
+data_num <- data_t[, sapply(data_t, is.numeric)]
+
+# Calculer les statistiques descriptives
+stats_desc <- data.frame(
+  Moyenne = sapply(data_num, mean, na.rm = TRUE),
+  Médiane = sapply(data_num, median, na.rm = TRUE),
+  Écart_type = sapply(data_num, sd, na.rm = TRUE),
+  Minimum = sapply(data_num, min, na.rm = TRUE),
+  Maximum = sapply(data_num, max, na.rm = TRUE)
+)
+
+# Afficher le tableau
+print(stats_desc)
+# write.csv(stats_desc, file = "statistiques_descriptives.csv", row.names = TRUE)
+```
+Interprètation: 
+Électricité : 85,8% d'accès en moyenne, avec une médiane à 100% indiquant que la majorité des pays ont un accès complet, mais certains sont en retard (minimum 10,3%).
+
+Agriculture : Contribution modeste au PIB (10,7% en moyenne), mais avec de fortes disparités entre pays (écart-type élevé de 10,8%).
+
+Croissance du PIB : Taux moyen positif de 3,2%, cependant la présence de valeurs négatives extrêmes (-22,7%) révèle une vulnérabilité certaine dans certains pays.
+
+Émissions de CO2 : moyenne élevée (571,4) masquée par une dispersion exceptionnelle, signe de profonds écarts entre pays pollueurs et non-pollueurs.
+
+Consommations d'énergies renouvelables : Part moyenne de 32,6% mais médiane à 24,2% confirme que peu de pays dépassent les 50% de mix renouvelable.
+
+Espérance de vie : Bon niveau général (72,3 ans) avec une distribution relativement homogène entre pays.
+
+Catastrophes naturelles : 2,4 catastrophes naturelles en moyenne par pays, mais avec une occurrence très inégale selon les régions.
+
+# Quelques graphiques simples 
+```{r}
+# Histogramme d’un indicateur
+hist(data_t$esperance_vie, main = "Répartition de l'espérance de vie", xlab = "Espérance de vie (années)",ylab="Effectif")
+
+hist(data_t$emissions_co2, main = "Répartition de l'espérance de vie", xlab = "Emissions de CO2",ylab="Effectif")
+
+hist(data_t$precipitations, main = "Répartition des précipitations", xlab = "Hauteur moyenne des précipitations",ylab="Effectif")
+
+hist(data_t$nb_cata_naturelles, main = "Répartition des nombres de catastrophes naturelles", xlab = "Nombre de catastrophes naturelles",ylab="Effectif")
+
+
+# Boxplot comparatif (par indicateur)
+boxplot(data_num, main = "Distribution des indicateurs", las = 2)
+
+# Diagramme de corrélation entre indicateurs
+pairs(data_num, main = "Nuage de points entre les indicateurs")
+
+# Corrélogramme pour visualiser les liens entre variables
+library(corrplot)
+corrplot(cor(data_num, use = "pairwise.complete.obs"), method = "color")
+```
+
+
+Interprètation: (Boite a moustache): Nous remarquons qu'on observe des valeurs aberantes pour l'indicateurs de l'emission de co2 
+(Boxplot): Le nuage de points des indicateurs n'est pas très visible donc nous allons l'ameliorer
+(Matrice de Corrélation) 
+Ce graphique montre les coefficients de corrélation entre les indicateurs. La couleur et l'intensité indiquent la force et la direction de la corrélation : le bleu foncé représente une forte corrélation positive (proche de +1), et le rouge foncé une forte corrélation négative (proche de -1). Le blanc indique une corrélation faible ou nulle (proche de 0)
+
+#Améliorer la boite a moustache et le diagramme de corrélation 
+```{r}
+data_scaled <- scale(data_num) # Créer un nouveau jeu de données standardisé
+# Boxplot comparatif (par indicateur)
+boxplot(data_scaled, main = "Distribution des indicateurs", las = 2)
+
+# Diagramme de corrélation entre indicateurs
+#ggpairs(data_num, main = "Nuage de points entre les indicateurs")
+
+# Créer la matrice de nuages de points améliorée
+point_size <- 0.5
+ggpairs(
+    data_num, 
+    main = "Matrice de corrélation et distributions des indicateurs",
+    
+    # Configuration de la diagonale (Distribution de chaque variable)
+    # Remplacer les histogrammes par des densités (souvent plus lisses)
+    diag = list(continuous = wrap("densityDiag")),
+    
+    # Configuration de la partie inférieure (Nuages de points)
+    # Utiliser des nuages de points plus petits
+    lower = list(continuous = wrap("points", alpha = 0.5, size = point_size)),
+    
+    # Configuration de la partie supérieure (Coefficients de corrélation)
+    # Afficher les valeurs de corrélation de Spearman (moins sensible aux outliers)
+    upper = list(continuous = wrap("cor", method = "spearman", size = 3))
+)
+```
+
+Pour ameliorer le resulat du corrèlogramme 
+```{r}
+corrplot(cor(data_num, use = "pairwise.complete.obs"),
+         method = "color",
+         type = "upper", # N'afficher que la partie supérieure
+         addCoef.col = "black", # Ajouter les coefficients en noir
+         number.cex = 0.7) # Taille de police pour les coefficients
+```
+
+Les couleurs sombres (bleu marine) indiquent de fortes corrélations positives (ex: electricite et esperance_vie à 0.75), tandis que le rouge foncé indique de fortes corrélations négatives (ex:  esperance_vie  et  taux_mort_inf  à -0.90). Ceci confirme que les indicateurs de santé/développement ( electricite ,  esperance_vie ) sont fortement liés et opposés aux indicateurs de faible développement ( agriculture ,  taux_mort_inf ). Les indicateurs comme  croissance_pib ,  precipitations  et  nb_cata_naturelles  montrent des corrélations généralement faibles, suggérant qu'ils mesurent des phénomènes distincts.
+
+# Importation de la carte monde
+
+Maintenant que nous connaissons les caractéristiques de nos données, nous voulons les visualiser dans leur contexte géographique. La fusion des données statistiques avec les données géographiques (via left_join) nous permet de créer des cartes 
+```{r}
+monde <- st_read("U:/Documents/S5/SAE5.EMS.01-Application statistique/monde.shp") 
+head(monde)
+dim(monde)
+```
+longitude et latitude represente le centroïde du pays
+
+#Fusion des données importantes à celle de la carte
+```{r}
+monde_data <- left_join(monde, data_t, by=c("ISO3" = "ISO")) # On fusionne les données des indicateurs avec la carte via le code ISO3
+head(monde_data)
+dim(monde)
+dim(monde_data)
+# write.csv(monde_data, file = "U:/Documents/S5/SAE5.EMS.01-Application statistique/monde_data.csv", row.names = TRUE)
+```
+
+# ACP
+
+Préparation du tableau
+L'objectif est de sélectionner les variables numériques pertinentes, les nommer correctement, et surtout, gérer les données manquantes avant d'exécuter l'ACP
+
+```{r}
+# Extraction de monde_data
+#head(data.frame(monde_data))
+donneesACP=data.frame(monde_data)[,13:23] # On sélectionne les colonnes des indicateurs
+row.names(donneesACP)=data.frame(monde_data)[,3]
+head(donneesACP)
+dim(donneesACP)
+# suppression des données manquantes
+dACP=donneesACP[!is.na(apply(donneesACP,1,sum)),]
+dim(dACP) # 176 pays sans donnée manquante
+```
+Le jeu de données initial pour l'ACP contient 246 observations (lignes,  pays/territoires, hérité de monde_data).
+
+Il contient 11 variables (colonnes, les indicateurs numériques)
+Le résultat montre que dACP contient 176 observations et toujours 11 variables.
+
+
+ACP
+
+# ```{r}
+# acp=PCA(dACP) # On réalise l'analyse en composantes principales
+# acp$eig # Valeurs propres
+# plot.PCA(acp,axes=c(1,2),choix="var") # Cercle des corrélations
+# plot.PCA(acp,axes=c(1,2),choix="ind") # Nuage des pays
+# ```
+
+```{r}
+acp=PCA(dACP)
+acp$eig
+# Cercle des corrélations
+plot.PCA(acp,axes=c(3,4),choix="var")
+# Nuage des pays (individus)
+plot.PCA(acp,axes=c(3,4),choix="ind")
+```
+
+L'analyse des valeurs propres permet de déterminer combien d'axes (dimensions) sont réellement informatifs et doivent être retenus pour l'interprétation.
+Composante(Dim),   Valeur Propre (Eigenvalue), Pourcentage de Variance, Cumulatif (%)
+Dim 1,             4.74                         43.08%                    43.08%
+Dim 2,             1.31                         11.90%                    54.99%
+Dim 3,             1.20                         10.95%                    65.94%
+Dim 4,             0.97                         8.80%                     74.73%
+
+Règle de Kaiser (Valeur Propre > 1) : Les trois premières dimensions (Dim 1, Dim 2, Dim 3) sont considérées comme significatives.
+
+Inertie Expliquée : Ces trois dimensions expliquent ensemble près de 66% de la variance totale contenue dans vos 11 indicateurs. C'est une bonne compression de l'information.
+
+Dominance de la Dim 1 : La première dimension est de loin la plus importante, capturant à elle seule 43.08% de la variance, ce qui est typique d'un facteur général de développement.
+
+Plan Principal (Dim 1 & Dim 2) : Facteur de Développement (≈ 55% de la variance)
+Axe 1 (Développement Humain et Infrastructures) :Oppose le Développement élevé (Électricité, Espérance de vie) aux Défis Démographiques et Ruraux (Taux de mortalité infantile, Croissance de la population, Agriculture).
+Les pays développés sont concentrés à gauche ; les pays moins développés/ruraux (comme CAF, SOM, TLS) se situent à droite.
+Axe 2 (Environnemental / Croissance) :Oppose la Dynamique Économique (Croissance du PIB, Précipitations) aux Pays Pollueurs (Émissions de CO_2).
+
+Plan Secondaire (Dim 3 & Dim 4) : Facteur de Risque (≈ 20% de la variance)
+Axe 3 (Catastrophes et Pollution) :Sépare les pays soumis à de fortes Pressions Environnementales et de Risque (Émissions de CO_2, Catastrophes Naturelles) des autres.
+Axe 4 (Croissance du PIB) :Cet axe est principalement dominé par la variable Croissance du PIB.
+
+Outliers et Profils Uniques
+TLS (Timor-Leste) : Se distingue sur plusieurs axes par un profil extrême (faible développement, fortes CO_2, croissance du PIB).
+USA : Se démarque sur les axes secondaires par un profil suggérant un fort niveau de Catastrophes Naturelles et CO_2 par rapport aux autres pays développés.
+
+#Amelioration de l'acp 
+Il y a trop d'individus concentrés au centre, rendant l'identification des pays difficile. De plus, les axes 3 et 4 expliquent moins de variance, il est préférable de se concentrer sur les axes 1 et 2.
+```{r}
+# On prend bien un vecteur
+iso_codes <- monde_data$ISO3[!is.na(apply(donneesACP, 1, sum))]
+# Vérification
+length(iso_codes) == nrow(dACP)  # Doit renvoyer TRUE
+# On peut maintenant attribuer comme rownames
+rownames(dACP) <- iso_codes
+
+# install.packages("factoextra")
+# Représentation des variables avec un dégradé selon leur qualité de représentation (cos2)
+fviz_pca_var(acp, 
+             col.var = "cos2", 
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE) 
+# Représentation des pays les plus contributifs aux axes principaux
+fviz_pca_ind(acp,
+             col.ind = "cos2", 
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             geom = "point",
+             label = "all",      # afficher les noms
+             select.ind = list(contrib = 20), # les 20 pays les plus représentatifs
+             repel = TRUE) 
+```
+
+
+<!--  Ces graphiques améliorés permettent une lecture plus claire : -->
+<!-- Les couleurs indiquent la qualité de représentation des variables et des pays. -->
+<!-- On distingue mieux les tendances principales sans que les points soient superposés. -->
+<!-- Cela rend l'interprétation des axes 1 et 2 beaucoup plus intuitive. -->
+
+
+# Classification hiérarichique
+C'est une Classification Ascendante Hiérarchique (CAH) sur les données de l'ACP pour regrouper les pays.
+```{r}
+cp=acp$ind$coord[,1:4] # On garde les 4 premiers axes
+#?hclust
+cah=hclust(dist(cp),method="ward.D2") # Méthode de Ward
+plot(cah,hang=-1,cex=0.6) # Dendrogramme
+```
+Le dendrogramme montre que la méthode de classification a réussi à regrouper les 176 pays en groupes hiérarchiques distincts basés sur leurs profils sur les quatre premières dimensions de l'ACP.
+Le graphique montre comment les pays sont progressivement regroupés, des plus similaires (bas de l'arbre, hauteur proche de 0) aux moins similaires (en haut de l'arbre, hauteur jusqu'à 25).
+
+On observe deux branches principales qui se rejoignent très haut (autour de 25), suggérant deux grands ensembles initiaux de pays. Il y a ensuite des sous-groupes qui se forment à des hauteurs inférieures (autour de 15, puis 5)
+le graphique est trop encombré pour permettre une analyse précise nous allonsprocéder a une amelioration.
+
+
+# Amelioration
+```{r}
+# Assurez-vous d'avoir installé 'factoextra' et 'cluster'
+# install.packages(c("factoextra", "cluster"))
+library(factoextra)
+library(cluster)
+
+
+k_classes <- 5 # Remplacer par la valeur de k choisie
+fviz_dend(cah, 
+          k = k_classes, 
+          show_labels = FALSE,
+          k_colors = "jco",         
+          rect = TRUE,              
+          rect_border = "jco",
+          rect_fill = TRUE,
+          main = paste("Dendrogramme (", k_classes, " classes)"),
+          cex = 0.5)               # Réduit la taille des labels si possible
+
+```
+Ce graphique est la visualisation réussie de la segmentation des 176 pays en cinq groupes distincts et compacts
+Les cinq couleurs (bleu foncé, jaune, rouge, bleu clair, etc.) et les rectangles mis en évidence correspondent aux 5 classes de pays.
+
+Partition en 5 classes
+```{r}
+cah5=cutree(cah,5) # Création de 5 groupes de pays
+#cah5
+```
+
+# Interprétation des classes
+
+Moyenne des variables par classe
+
+```{r}
+mparclasse=function(donnees,classes)
+{
+  tmoy=apply(donnees,2,tapply,classes,mean)
+  eff=table(classes)
+  tmoy=cbind(tmoy,effectif=eff)
+  row.names(tmoy)=paste("classe",1:length(table(classes)))
+  tmoy=rbind(tmoy,Ensemble=c(apply(donnees,2,mean),sum(eff)))
+  return(tmoy)
+}
+round(mparclasse(dACP,cah5),digits=2) # Moyenne par groupe
+```
+Classe 1 (Majoritaire, 103 pays) : Pays très développés (Électricité approximativement  99%, Espérance de vie élevée, faible mortalité infantile).Classe 4 (10 pays) : Pays développés mais à haut risque (nombre record de Catastrophes Naturelles et Croissance_PIB négative).
+Classe 2 (38 pays) : Pays en développement intermédiaire caractérisés par une forte pollution (CO_2 élevée) et une mortalité infantile notable.
+Classe 3 (24 pays) : Pays peu développés et ruraux (faible Électricité approximativement 38%, très forte Agriculture et plus forte Mortalité Infantile).
+Classe 5 (1 pays) : Outlier extrême présentant une croissance du PIB massivement négative et des émissions de CO_2 exceptionnellement élevées.
+
+# Carte des pays avec les classes
+
+Fusion des classes avec la carte
+```{r}
+classes=cah5
+k=length(table(classes))
+cl=data.frame(classes,ISO=names(classes))
+mCL=merge(monde,cl,by.x="ISO3",by.y="ISO",sort=FALSE)
+head(data.frame(mCL),3)
+```
+
+```{r}
+plot(st_geometry(mCL), col = as.factor(mCL$classes), border = 'grey', axes = TRUE)
+legend(-170,0,paste("CL",1:k,sep=""),fill=1:k, bty="n",title="Classes de pays",cex=0.6,col=1:k)
+```
+La carte montre une forte concentration géographique des classes, les pays développés (Classe 1, Noir) dominent l'Amérique, l'Europe de l'Ouest et l'Australie, contrastant fortement avec les pays les moins développés et ruraux (Classe 3, Vert) qui sont regroupés majoritairement en Afrique subsaharienne et en Asie du Sud.
+
+#Carte leaflet
+C'est la carte leaflet pour presenté tout les pays ou on a la valeur de l'electricité
+
+
+#----------- Analyse temporelle : évolution des émissions de C02 ---------------
+# Exemple pour 2 pays (France et USA)
+
+Extraction des données
+```{r}
+#emissions_C02
+CO2_USA=emissions_co2[emissions_co2$Country.Code=="USA",45:67]
+CO2_FRA=emissions_co2[emissions_co2$Country.Code=="FRA",45:67]
+serie_CO2=data.frame(annee=2000:2022,CO2_USA=t(CO2_USA),CO2_FRA=t(CO2_FRA))
+```
+
+
+```{r}
+ggplot(data=serie_CO2,aes(x=annee,y=serie_CO2$X252))+
+  geom_line(aes(color="USA"))+
+  geom_line(aes(y=serie_CO2$X78,color="France"))+
+  labs(title = "Évolution des émissions de CO2", x = "Année", y = "Variation des émissions (%)", color = "Pays")
+```
+L’évolution des émissions de CO2 montre des tendances contrastées mais globalement décroissantes sur la période étudiée pour la France et les États‑Unis, avec plusieurs variations intermédiaires. Pour la France (ligne rouge), les émissions ont commencé légèrement au-dessus de 4 % en 2002, ont diminué progressivement jusqu’à atteindre environ -25 % en 2020, avant de remonter légèrement à environ -19 % en 2022. Cette baisse importante traduit une réduction globale des émissions, probablement liée à des politiques énergétiques et environnementales plus strictes, bien que les fluctuations indiquent des variations annuelles dues à différents facteurs économiques ou climatiques. Pour les États‑Unis (ligne bleue), les émissions ont démarré plus haut, autour de 18 % en 2002, puis ont également diminué pour atteindre environ -10 % en 2020, avant de remonter légèrement à près de 6 % en 2022. Ici encore, la tendance générale est à la baisse, mais les variations montrent que la trajectoire n’est pas linéaire et qu’elle est influencée par des cycles économiques, des événements spécifiques et des politiques de réduction des émissions.
+
+En résumé, la diminution des émissions sur le long terme montre un effort de réduction de la pollution carbone, mais les oscillations annuelles indiquent que ces efforts sont sensibles aux conditions économiques et aux choix politiques.
+
+
+# --- Analyse temporelle : Surface forestière ---
+```{r}
+FOR_USA <- surface_fores[surface_fores$Country.Code == "USA", 45:67]
+FOR_FRA <- surface_fores[surface_fores$Country.Code == "FRA", 45:67]
+serie_FOR <- data.frame(annee = 2000:2022, FOR_USA = t(FOR_USA), FOR_FRA = t(FOR_FRA))
+```
+
+```{r}
+ggplot(data = serie_FOR, aes(x = annee,y=X252)) +
+  geom_line(aes(color = "USA")) +
+  geom_line(aes(y=X78, color = "France")) +
+  labs(title = "Évolution des surfaces forestières", x = "Année", y = "Surface forestière (% du territoire)", color = "Pays")
+```
+L’évolution des surfaces forestières, mesurée en pourcentage du territoire, présente des tendances différentes pour la France et les États‑Unis. Pour la France (ligne rouge), la surface forestière commence à environ 79 % en 2000 et reste relativement stable jusqu’en 2003. Ensuite, elle connaît une légère augmentation avec quelques variations, atteignant environ 82,5 % entre 2013 et 2018, avant de diminuer légèrement pour se stabiliser autour de 82 % en 2022. Cela montre une tendance générale à l’expansion ou à la stabilité des forêts françaises sur la période, avec des variations modérées probablement liées à la gestion forestière et aux activités humaines.
+
+Pour les États‑Unis (ligne bleue), la surface forestière commence à environ 76,5 % en 2000 et augmente légèrement pour atteindre 79 % en 2019. Elle diminue ensuite pour revenir à 76,5 % en 2021, puis remonte légèrement jusqu’à environ 77 % en 2022. Ces variations modérées suggèrent que la surface forestière aux États‑Unis reste globalement stable, mais qu’elle peut être influencée par les cycles de reboisement, les activités humaines ou les variations de mesure.
+
+Résumé : La France montre une surface forestière stable et légèrement croissante autour de 82 %, tandis que les États‑Unis présentent des fluctuations plus modérées autour de 77 %. Dans les deux cas, la couverture forestière reste relativement constante, mais chaque pays connaît des variations temporaires liées à des facteurs naturels ou causés par l’homme.
+
+
+
+# --- Modélisation simple sur les émissions de CO2 ---
+Modélisation linéaire
+
+```{r}
+regCO2=lm(X252~annee,data=serie_CO2)
+regCO2
+plot(serie_CO2$annee,serie_CO2$X252,type='l',xlab="Année",ylab="CO2")
+lines(serie_CO2$annee,regCO2$fitted.values,col="red")
+```
+
+Modélisation exponentielle
+
+On ne peut pas transformer l'année en exponentielle, cela donne des valeurs trop grandes. 
+Solution : soit on ajuste le logarithme de y à x, soit on décale les années. 
+Choix : avec le logarithme.
