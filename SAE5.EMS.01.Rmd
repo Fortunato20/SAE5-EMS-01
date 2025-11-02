@@ -580,7 +580,49 @@ La carte montre une forte concentration géographique des classes, les pays dév
 
 #Carte leaflet
 C'est la carte leaflet pour presenté tout les pays ou on a la valeur de l'electricité
+```{r}
+library(leaflet) 
+# Si vous recevez une erreur ici, vous devez d'abord l'installer : install.packages("leaflet")
 
+# Définir l'indicateur que vous voulez montrer dans le pop-up
+indicateur_a_afficher <- "electricite"
+
+# Définir la couleur et la taille des marqueurs (ajustez selon votre besoin)
+couleur_marqueurs <- "red"
+rayon_marqueurs <- 5 # Un rayon plus grand rend les points plus visibles
+
+# --- Création de la Carte Leaflet ---
+m <- leaflet(data = monde_data) %>%
+  
+  # 1. Ajouter le fond de carte (OpenStreetMap est un bon choix)
+  addProviderTiles("OpenStreetMap.Mapnik") %>%
+  
+  # 2. Ajouter les marqueurs circulaires
+  addCircleMarkers(
+    ~LON, ~LAT, # Coordonnées à utiliser
+    radius = rayon_marqueurs,
+    color = couleur_marqueurs,
+    fillOpacity = 0.8,
+    stroke = FALSE, # Supprime le contour noir
+    
+    # 3. Définir le contenu du pop-up (ce qui apparaît au clic)
+    popup = ~paste0(
+      "<b>Pays:</b> ", NAME, "<br>",
+      "<b>", indicateur_a_afficher, ":</b> ", electricite, "%"
+    ),
+    
+    # 4. Définir le contenu du label (ce qui apparaît au survol)
+    label = ~NAME,
+    labelOptions = labelOptions(
+      style = list("font-weight" = "bold", "padding" = "3px 8px"),
+      textsize = "15px",
+      direction = "auto"
+    )
+  )
+
+# Afficher la carte
+m
+```
 
 #----------- Analyse temporelle : évolution des émissions de C02 ---------------
 # Exemple pour 2 pays (France et USA)
@@ -640,4 +682,5 @@ Modélisation exponentielle
 
 On ne peut pas transformer l'année en exponentielle, cela donne des valeurs trop grandes. 
 Solution : soit on ajuste le logarithme de y à x, soit on décale les années. 
+
 Choix : avec le logarithme.
