@@ -23,7 +23,7 @@ suppressPackageStartupMessages(library(htmlwidgets))
 # Importation des données
 ```{r}
 # chemin <-"C:/Users/33749/OneDrive/Documents/SAE5.EMS.01-Application statistique"
-chemin <-"U:/Documents/S5/SAE5.EMS.01-Application statistique"
+chemin <-"U:/Documents/BUT3/SAE_501_application_stat"
 setwd(chemin)
 getwd()
 electricite = openxlsx::read.xlsx("acces_electricite.xlsx", sheet="Data", startRow=4)
@@ -320,16 +320,7 @@ hist(data_t$precipitations, main = "Répartition des précipitations", xlab = "H
 
 hist(data_t$nb_cata_naturelles, main = "Répartition des nombres de catastrophes naturelles", xlab = "Nombre de catastrophes naturelles",ylab="Effectif")
 
-
-# Boxplot comparatif (par indicateur)
-boxplot(data_num, main = "Distribution des indicateurs", las = 2)
-
-# Diagramme de corrélation entre indicateurs
-pairs(data_num, main = "Nuage de points entre les indicateurs")
-
-# Corrélogramme pour visualiser les liens entre variables
-library(corrplot)
-corrplot(cor(data_num, use = "pairwise.complete.obs"), method = "color")
+hist(data_t$precipitations, main = "Répartition de la hauteurs moyenne des precipitations", xlab = "precipitation moyennes",ylab="Effectif")
 ```
 
 
@@ -369,6 +360,7 @@ ggpairs(
 
 Pour ameliorer le resulat du corrèlogramme 
 ```{r}
+library(corrplot)
 corrplot(cor(data_num, use = "pairwise.complete.obs"),
          method = "color",
          type = "upper", # N'afficher que la partie supérieure
@@ -593,47 +585,131 @@ C'est la carte leaflet pour presenté tout les pays ou on a la valeur de l'elect
 
 ```{r}
 library(leaflet) 
-# Si vous recevez une erreur ici, vous devez d'abord l'installer : install.packages("leaflet")
+library(dplyr) # Nécessaire pour la fonction filter()
 
-# Définir l'indicateur que vous voulez montrer dans le pop-up
+# Définir l'indicateur
 indicateur_a_afficher <- "electricite"
 
-# Définir la couleur et la taille des marqueurs (ajustez selon votre besoin)
-couleur_marqueurs <- "red"
-rayon_marqueurs <- 5 # Un rayon plus grand rend les points plus visibles
+# --- FILTRAGE : Supprimer les pays où 'electricite' est NA ---
+monde_data_filtre <- monde_data %>%
+  filter(!is.na(electricite))
 
-# --- Création de la Carte Leaflet ---
-m <- leaflet(data = monde_data) %>%
+# --- Création de la palette de couleurs (basée sur le jeu de données filtré) ---
+palette_electricite <- colorNumeric(
+  # Palette séquentielle (du clair au foncé, donc du petit au grand)
+  palette = "Blues", 
+  # Domaine basé sur les données NON-NA
+  domain = monde_data_filtre$electricite
+  # On n'a plus besoin de na.color puisque les NA sont filtrés
+)
+
+# --- Création de la Carte Leaflet Modifiée ---
+m_sans_na <- leaflet(data = monde_data_filtre) %>% # ATTENTION : Utilise le jeu de données filtré
   
-  # 1. Ajouter le fond de carte (OpenStreetMap est un bon choix)
-  addProviderTiles("OpenStreetMap.Mapnik") %>%
+  # 1. Ajouter le fond de carte
+  addProviderTiles("CartoDB.Positron") %>% 
   
-  # 2. Ajouter les marqueurs circulaires
+  # 2. Ajouter les marqueurs circulaires avec COULEUR DYNAMIQUE
   addCircleMarkers(
-    ~LON, ~LAT, # Coordonnées à utiliser
-    radius = rayon_marqueurs,
-    color = couleur_marqueurs,
+    ~LON, ~LAT, 
+    radius = 5,
+    # Utilisation de la palette
+    color = ~palette_electricite(electricite), 
     fillOpacity = 0.8,
-    stroke = FALSE, # Supprime le contour noir
+    stroke = FALSE, 
     
-    # 3. Définir le contenu du pop-up (ce qui apparaît au clic)
+    # Définir le contenu du pop-up
     popup = ~paste0(
       "<b>Pays:</b> ", NAME, "<br>",
       "<b>", indicateur_a_afficher, ":</b> ", electricite, "%"
     ),
     
-    # 4. Définir le contenu du label (ce qui apparaît au survol)
+    # Définir le contenu du label
     label = ~NAME,
     labelOptions = labelOptions(
       style = list("font-weight" = "bold", "padding" = "3px 8px"),
       textsize = "15px",
       direction = "auto"
     )
+  ) %>%
+  
+  # 3. AJOUT DE LA LÉGENDE
+  addLegend(
+    pal = palette_electricite,
+    values = ~electricite, # Les valeurs pour lesquelles la légende est générée
+    title = "Accès à l'électricité (%)",
+    position = "bottomright",
+    opacity = 1
   )
 
 # Afficher la carte
-m
+m_sans_na
 ```
+
+C'est la carte leaflet pour presenté tout les pays ou on a la valeur de la hauteur moyenne
+```{r}
+library(leaflet) 
+library(dplyr) # Nécessaire pour la fonction filter()
+
+# --- NOUVEL INDICATEUR : Précipitations (mm/an) ---
+indicateur_a_afficher <- "precipitations"
+unite <- " mm/an" # Nouvelle unité pour le pop-up et la légende
+
+# --- FILTRAGE : Supprimer les pays où 'precipitations' est NA ---
+monde_data_filtre <- monde_data %>%
+  filter(!is.na(precipitations))
+
+# --- Création de la palette de couleurs ---
+# J'utilise 'YlGnBu' (Yellow-Green-Blue) : clair pour les faibles précipitations, foncé pour les fortes.
+palette_pluie <- colorNumeric(
+  palette = "YlGnBu", 
+  # Domaine basé sur les données NON-NA de 'precipitations'
+  domain = monde_data_filtre$precipitations
+)
+
+# --- Création de la Carte Leaflet Modifiée ---
+m_pluie <- leaflet(data = monde_data_filtre) %>% # Utilise le jeu de données filtré
+  
+  # 1. Ajouter le fond de carte
+  addProviderTiles("CartoDB.Positron") %>% 
+  
+  # 2. Ajouter les marqueurs circulaires avec COULEUR DYNAMIQUE
+  addCircleMarkers(
+    ~LON, ~LAT, 
+    radius = 5,
+    # Utilisation de la nouvelle palette 'pluie'
+    color = ~palette_pluie(precipitations), 
+    fillOpacity = 0.8,
+    stroke = FALSE, 
+    
+    # 3. Définir le contenu du pop-up
+    popup = ~paste0(
+      "<b>Pays:</b> ", NAME, "<br>",
+      "<b>", indicateur_a_afficher, ":</b> ", precipitations, unite
+    ),
+    
+    # 4. Définir le contenu du label
+    label = ~NAME,
+    labelOptions = labelOptions(
+      style = list("font-weight" = "bold", "padding" = "3px 8px"),
+      textsize = "15px",
+      direction = "auto"
+    )
+  ) %>%
+  
+  # 5. AJOUT DE LA LÉGENDE
+  addLegend(
+    pal = palette_pluie,
+    values = ~precipitations, # Les valeurs pour lesquelles la légende est générée
+    title = "Précipitations annuelles (mm)",
+    position = "bottomright",
+    opacity = 1
+  )
+
+# Afficher la carte
+m_pluie
+```
+
 
 
 #----------- Analyse temporelle : évolution des émissions de C02 ---------------
