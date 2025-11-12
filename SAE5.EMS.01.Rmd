@@ -22,7 +22,7 @@ suppressPackageStartupMessages(library(htmlwidgets))
 
 # Importation des données
 ```{r}
-# chemin <-"C:/Users/33749/OneDrive/Documents/SAE5.EMS.01-Application statistique/monde.shp"
+# chemin <-"C:/Users/33749/OneDrive/Documents/SAE5.EMS.01-Application statistique"
 chemin <-"U:/Documents/S5/SAE5.EMS.01-Application statistique"
 setwd(chemin)
 getwd()
@@ -39,19 +39,19 @@ taux_mort_inf = openxlsx::read.xlsx("taux_mortalite_infantile.xlsx", sheet="Data
 ```
 
 
-Test de bonne implantation
-```{r}
-str(electricite)
-str(agriculture)
-str(precipitations)
-str(energie_renouv)
-str(croissance_pib)
-str(croissance_pop)
-str(emissions_co2)
-str(esperance_vie)
-str(surface_fores)
-str(taux_mort_inf)
-```
+<!-- Test de bonne implantation -->
+<!-- ```{r} -->
+<!-- str(electricite) -->
+<!-- str(agriculture) -->
+<!-- str(precipitations) -->
+<!-- str(energie_renouv) -->
+<!-- str(croissance_pib) -->
+<!-- str(croissance_pop) -->
+<!-- str(emissions_co2) -->
+<!-- str(esperance_vie) -->
+<!-- str(surface_fores) -->
+<!-- str(taux_mort_inf) -->
+<!-- ``` -->
 
 # Nettoyage : récupération de la dérnière année où la valeur est connue
 
@@ -466,27 +466,37 @@ USA : Se démarque sur les axes secondaires par un profil suggérant un fort niv
 #Amelioration de l'acp 
 Il y a trop d'individus concentrés au centre, rendant l'identification des pays difficile. De plus, les axes 3 et 4 expliquent moins de variance, il est préférable de se concentrer sur les axes 1 et 2.
 ```{r}
-# On prend bien un vecteur
-iso_codes <- monde_data$ISO3[!is.na(apply(donneesACP, 1, sum))]
-# Vérification
-length(iso_codes) == nrow(dACP)  # Doit renvoyer TRUE
-# On peut maintenant attribuer comme rownames
-rownames(dACP) <- iso_codes
+# créer un data.frame propre (copier as.data.frame pour éviter les colonnes 'sf')
+tmp <- as.data.frame(monde_data)[,13:23]
+#str(tmp)          
+#sapply(tmp, class) 
 
-# install.packages("factoextra")
-# Représentation des variables avec un dégradé selon leur qualité de représentation (cos2)
+# garder seulement les colonnes numériques
+is_num <- sapply(tmp, function(x) is.numeric(x) || is.integer(x))
+donneesACP <- tmp[, is_num, drop = FALSE]  
+
+iso_full <- as.character(monde_data$ISO3)   
+
+#  garder uniquement les lignes sans NA dans donneesACP
+garder_rows <- complete.cases(donneesACP)
+
+iso_codes <- iso_full[garder_rows]
+rownames(dACP) <- iso_codes
+acp <- PCA(dACP, graph = FALSE)
+
+# Représentation des variables (inchangée)
 fviz_pca_var(acp, 
              col.var = "cos2", 
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE) 
-# Représentation des pays les plus contributifs aux axes principaux
+             repel = TRUE)
+
+# ✅ Représentation des pays (individus) avec noms visibles pour les plus contributifs
 fviz_pca_ind(acp,
              col.ind = "cos2", 
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             geom = "point",
-             label = "all",      # afficher les noms
-             select.ind = list(contrib = 20), # les 20 pays les plus représentatifs
-             repel = TRUE) 
+             geom = "text",                   # remplacer "point" par "text" pour voir les noms
+             select.ind = list(contrib = 20), # ne garder que les 20 plus contributifs
+             repel = TRUE)                   
 ```
 
 
@@ -580,6 +590,7 @@ La carte montre une forte concentration géographique des classes, les pays dév
 
 #Carte leaflet
 C'est la carte leaflet pour presenté tout les pays ou on a la valeur de l'electricité
+
 ```{r}
 library(leaflet) 
 # Si vous recevez une erreur ici, vous devez d'abord l'installer : install.packages("leaflet")
@@ -623,6 +634,7 @@ m <- leaflet(data = monde_data) %>%
 # Afficher la carte
 m
 ```
+
 
 #----------- Analyse temporelle : évolution des émissions de C02 ---------------
 # Exemple pour 2 pays (France et USA)
@@ -682,5 +694,4 @@ Modélisation exponentielle
 
 On ne peut pas transformer l'année en exponentielle, cela donne des valeurs trop grandes. 
 Solution : soit on ajuste le logarithme de y à x, soit on décale les années. 
-
 Choix : avec le logarithme.
