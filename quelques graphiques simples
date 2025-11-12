@@ -1,0 +1,23 @@
+# Quelques graphiques simples 
+```{r}
+# Histogramme d’un indicateur
+hist(data_t$esperance_vie, main = "Répartition de l'espérance de vie", xlab = "Espérance de vie (années)",ylab="Effectif")
+
+hist(data_t$emissions_co2, main = "Répartition de l'espérance de vie", xlab = "Emissions de CO2 LULUCF (% de variation depuis 1990)",ylab="Effectif")
+
+hist(data_t$precipitations, main = "Répartition des précipitations", xlab = "Hauteur moyenne des précipitations (mm par an)",ylab="Effectif")
+
+hist(data_t$nb_cata_naturelles, main = "Répartition des nombres de catastrophes naturelles", xlab = "Nombre de catastrophes naturelles ",ylab="Effectif")
+
+hist(data_t$surface_fores, main = "Répartition de surface forestiere", xlab = "surface_fores (% du territoire)",ylab="Effectif")
+
+hist(data_t$taux_mort_inf , main = "Répartition du taux de mortalité infantile ", xlab = "taux_mort_inf (pour 1000 naissances vivantes)",ylab="Effectif")
+
+
+hist(data_t$agriculture , main = "Répartition sur l'agriculture", xlab = "agriculture (% du PIB) ",ylab="Effectif")
+
+hist(data_t$energie_renouv  , main = "Répartition de l'enérgie renouvelable", xlab = "energie_renouv (% de la consommation totale d’énergie) ",ylab="Effectif")
+
+hist(data_t$croissance_pib   , main = "Répartition sur la croissance du pib", xlab = "croissance_pib  ",ylab="Effectif")
+
+hist(data_t$croissance_pop   , main = "Répartition sur la croissance de la population ", xlab = "croissance_pop (% annuel) ",ylab="Effectif")
