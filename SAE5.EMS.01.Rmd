@@ -376,7 +376,7 @@ corrplot(cor(data_num, use = "pairwise.complete.obs"), method = "color")
 ```
 
 
-# Boîte a moustache et diagramme de corrélation (AMélioré)
+# Boîte a moustache et diagramme de corrélation (Amélioré)
 ```{r, warning=FALSE,message=FALSE}
 data_scaled <- scale(data_num) # Créer un nouveau jeu de données standardisé
 # Boxplot comparatif (par indicateur)
@@ -459,7 +459,163 @@ Les couleurs sombres (bleu marine) indiquent de fortes corrélations positives (
 
 # inverser, mettre le rouge pour la corrélation positive et le bleu pour le negatif (facultatif)
 
-# Boite à moustache de tou les pays par indicateur et analyse croisée de certains indicateurs (2à2)
+# Boite à moustache de tous les pays par indicateur et analyse croisée de certains indicateurs (2à2)
+```{r}
+library(dplyr)
+
+# Standardisation
+data_scaled <- scale(data_num)
+
+# Conversion en data.frame et ajout des pays
+data_scaled_df <- as.data.frame(data_scaled)
+data_scaled_df$pays <- data_t$pays
+
+# Fonction pour extraire min, Q1, mean, Q3, max + pays associés
+get_stats <- function(df, var) {
+ 
+  x <- df[[var]]
+ 
+  # Quartiles
+  q1 <- quantile(x, 0.25, na.rm = TRUE)
+  q3 <- quantile(x, 0.75, na.rm = TRUE)
+ 
+  # valeurs exactes
+  vmin <- min(x, na.rm = TRUE)
+  vmax <- max(x, na.rm = TRUE)
+  mean_val <- mean(x, na.rm = TRUE)
+ 
+  # pays associés
+  pmin   <- df$pays[which.min(x)]
+  pmax   <- df$pays[which.max(x)]
+  pq1    <- df$pays[which.min(abs(x - q1))]
+  pq3    <- df$pays[which.min(abs(x - q3))]
+  pmean  <- df$pays[which.min(abs(x - mean_val))]
+ 
+  data.frame(
+    variable = var,
+    type = c("Min", "Q1", "Moyenne", "Q3", "Max"),
+    valeur = c(vmin, q1, x[which.min(abs(x - mean_val))], q3, vmax),
+    pays = c(pmin, pq1, pmean, pq3, pmax)
+  )
+}
+
+# Statistiques pour tous les indicateurs
+indicateurs <- colnames(data_num)
+stats_list <- lapply(indicateurs, function(v) get_stats(data_scaled_df, v))
+stats_all <- do.call(rbind, stats_list)
+
+# --- AFFICHAGE : BOXLOT + POINTS + LABELS ---
+for (var in indicateurs) {
+ 
+  boxplot(data_scaled_df[[var]],
+          main = paste("Distribution de", var),
+          ylab = "Valeur standardisée")
+ 
+  # On sélectionne uniquement les stats du bon indicateur
+  d <- stats_all[stats_all$variable == var, ]
+ 
+  # Points : chaque statistique
+  points(rep(1, nrow(d)), d$valeur,
+         pch = c(19, 17, 15, 17, 19),
+         cex = 1.3)
+ 
+  # Labels à droite
+  text(1.1, d$valeur,
+       labels = paste(d$type, ":", d$pays),
+       pos = 4, cex = 0.75)
+}
+```
+
+
+
+```{r}
+library(ggplot2)
+library(ggrepel)
+
+# Analyse bivariée : Espérance de vie en X
+x_var <- "esperance_vie"
+y_var <- "croissance_pop"
+
+df_plot <- data_t[, c("pays", x_var, y_var)]
+df_plot <- df_plot %>% na.omit()
+
+ggplot(df_plot, aes_string(x = x_var, y = y_var, label = "pays")) +
+  geom_point(size = 2) +
+  geom_text_repel(size = 3, max.overlaps = 20) +
+  theme_minimal() +
+  labs(
+    title = paste("Analyse bivariée :", y_var, "en fonction de", x_var),
+    x = "Espérance de vie (années)",
+    y = y_var
+  )
+```
+
+
+```{r}
+library(ggplot2)
+library(ggrepel)
+
+df <- data_t   # Jeu de données propre
+
+###############################################
+# 1️⃣ Espérance de vie vs Accès à l'électricité
+###############################################
+ggplot(df, aes(x = electricite, y = esperance_vie, label = pays)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_text_repel(size = 3) +
+  labs(
+    title = "Espérance de vie vs Accès à l'électricité",
+    x = "Accès à l'électricité (%)",
+    y = "Espérance de vie (années)"
+  ) +
+  theme_minimal()
+
+
+# 3️⃣ Espérance de vie vs Taux de mortalité infantile (< 5 ans)
+###############################################################
+ggplot(df, aes(x = taux_mort_inf, y = esperance_vie, label = pays)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_text_repel(size = 3) +
+  labs(
+    title = "Espérance de vie vs Taux de mortalité infantile",
+    x = "Mortalité infantile (pour 1000 naissances)",
+    y = "Espérance de vie (années)"
+  ) +
+  theme_minimal()
+
+
+###############################################################
+# 4️⃣ Émissions CO₂ vs Énergie renouvelable (pas d'espérance vie)
+###############################################################
+ggplot(df, aes(x = energie_renouv, y = emissions_co2, label = pays)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_text_repel(size = 3) +
+  labs(
+    title = "Énergie renouvelable vs Émissions de CO₂",
+    x = "Énergie renouvelable (% consommation totale)",
+    y = "Émissions CO₂ (variation depuis 1990)"
+  ) +
+  theme_minimal()
+
+
+################################################################
+# 5️⃣ Croissance PIB vs Accessibilité à l'électricité (pas esp. vie)
+################################################################
+ggplot(df, aes(x = electricite, y = croissance_pib, label = pays)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_text_repel(size = 3) +
+  labs(
+    title = "Accès à l'électricité vs Croissance du PIB",
+    x = "Accès à l'électricité (%)",
+    y = "Croissance PIB (%)"
+  ) +
+  theme_minimal()
+```
+
 
 
 # Importation de la carte monde
