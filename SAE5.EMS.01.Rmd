@@ -644,32 +644,30 @@ plot.PCA(acp,axes=c(3,4),choix="var")
 # Nuage des pays (individus)
 plot.PCA(acp,axes=c(3,4),choix="ind")
 ```
-
 L'analyse des valeurs propres permet de déterminer combien d'axes (dimensions) sont réellement informatifs et doivent être retenus pour l'interprétation.
-Composante(Dim),   Valeur Propre (Eigenvalue), Pourcentage de Variance, Cumulatif (%)
-Dim 1,             4.74                         43.08%                    43.08%
-Dim 2,             1.31                         11.90%                    54.99%
-Dim 3,             1.20                         10.95%                    65.94%
-Dim 4,             0.97                         8.80%                     74.73%
+        eigenvalue            percentage of variance               cumulative percentage of variance
+comp 1  4.14524731             37.6840664                          37.68407
+comp 2  1.94701414             17.7001286                          55.38419
+comp 3  1.06634160              9.6940145                          65.07821
+comp 4  0.99525902              9.0478093                          74.12602
 
-Règle de Kaiser (Valeur Propre > 1) : Les trois premières dimensions (Dim 1, Dim 2, Dim 3) sont considérées comme significatives.
+#--------- Analyse des Valeurs Propres ---------#
 
-Inertie Expliquée : Ces trois dimensions expliquent ensemble près de 66% de la variance totale contenue dans vos 11 indicateurs. C'est une bonne compression de l'information.
+- Les deux premières dimensions, Dim 1 (37.68%) et Dim 2 (17.70%), expliquent à elles seules 55.38% de la variance totale. Ces deux axes suffisent à capter l'essentiel de l'information. On peut déjà se contenter de les interpréter.
+-  La Dim 3 (9.69%) et la Dim 4 (9.05%) sont plus anecdotiques mais pas totalement inutiles, ensemble elles atteignent environ 18.74% et portent le cumul à 74.12% après Dim 4.
 
-Dominance de la Dim 1 : La première dimension est de loin la plus importante, capturant à elle seule 43.08% de la variance, ce qui est typique d'un facteur général de développement.
+- Règle de Kaiser (Valeur Propre > 1) : Les trois premières dimensions (Dim 1, Dim 2, Dim 3) sont considérées comme significatives. La Dim 4 est à 0.995 donc elle est presque à la limite.
 
-Plan Principal (Dim 1 & Dim 2) : Facteur de Développement (≈ 55% de la variance)
-Axe 1 (Développement Humain et Infrastructures) :Oppose les pays avec le Développement élevé (Électricité, Espérance de vie) aux pays aux Défis Démographiques et Ruraux (Taux de mortalité infantile, Croissance de la population, Agriculture).
-Les pays développés sont concentrés à gauche ; les pays moins développés/ruraux (comme CAF, SOM, TLS) se situent à droite.
-Axe 2 (Environnemental / Croissance) :Oppose les pays avec une forte Dynamique Économique (Croissance du PIB, Précipitations) aux Pays les plus Pollueurs (Émissions de CO_2).
+Bilan : On peut se concentrer sur les deux premiers plans (Dim 1/2 et Dim 3/4) pour une interprétation complète.
 
-Plan Secondaire (Dim 3 & Dim 4) : Facteur de Risque (≈ 20% de la variance)
-Axe 3 (Catastrophes et Pollution) :Sépare les pays soumis à de fortes Pressions Environnementales et de Risque (Émissions de CO_2, Catastrophes Naturelles) des autres ( ceux qui on en moins).
-Axe 4 (Croissance du PIB) :Cet axe est principalement dominé par la variable Croissance du PIB.
+Inertie Expliquée : Ces 4 dimensions expliquent ensemble près de 74% de la variance totale contenue dans nos 11 indicateurs. C'est une bonne compression de l'information.
 
-Outliers et Profils Uniques
-TLS (Timor-Leste) : Se distingue sur plusieurs axes par un profil extrême (faible développement, fortes CO_2, croissance du PIB).
-USA : Se démarque sur les axes secondaires par un profil suggérant un fort niveau de Catastrophes Naturelles et CO_2 par rapport aux autres pays développés.
+Dominance de la Dim 1 : La première dimension est de loin la plus importante, capturant à elle seule 37.68% de la variance.
+
+#--------- Interprétation du Plan 1/2 (Dim 1 vs Dim 2) ---------#
+
+# Cercle des Corrélations (Variables)
+
 
 #Amelioration du nuage des individus
 Il y a trop d'individus concentrés au centre, rendant l'identification des pays difficile. De plus, les axes 3 et 4 expliquent moins de variance, il est préférable de se concentrer sur les axes 1 et 2.
@@ -1017,4 +1015,5 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
