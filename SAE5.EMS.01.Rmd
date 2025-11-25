@@ -23,7 +23,7 @@ suppressPackageStartupMessages(library(htmlwidgets))
 # Importation des données
 ```{r}
 # chemin <-"C:/Users/33749/OneDrive/Documents/SAE5.EMS.01-Application statistique"
-chemin <-"U:/Documents/S5/SAE5.EMS.01-Application statistique"
+chemin <-"U:/Documents/BUT3/SAE_501_application_stat"
 setwd(chemin)
 getwd()
 electricite = openxlsx::read.xlsx("acces_electricite.xlsx", sheet="Data", startRow=4)
@@ -318,9 +318,9 @@ print(stats_desc)
 ```
 Interprètation: 
 
-Électricité : 85,8% d'accès en moyenne, avec une médiane à 100% indiquant que la majorité des pays ont un accès complet, mais certains sont en retard (minimum 10,3%).
+Électricité : 85,43% d'accès en moyenne, avec une médiane à 100% indiquant que la majorité des pays ont un accès complet, mais certains sont en retard (minimum 10,3%).
 
-Agriculture : Contribution modeste au PIB (10,7% en moyenne), mais avec de fortes disparités entre pays (écart-type élevé de 10,8%).
+Agriculture : Contribution modeste au PIB (10,7% en moyenne), mais avec de fortes disparités entre pays (écart-type élevé de 10,8%)..
 
 Précipitations : IL y'a en moyenne 1172.2 mm de précipitaitons par an. La dispertion n'est pas du tout homogène selon les régions.
 
@@ -328,8 +328,7 @@ Croissance du PIB : Taux moyen positif de 3,2%, cependant la présence de valeur
 
 Croissance de la population : en moyenne la population croit de 1.2%, ce qui est assez modéré. Avec une distribution assez homogène entre les pays.
 
-Émissions de CO2 : moyenne élevée (4329.07 KGCo2eq/hab) masquée par une dispersion exceptionnelle (ecart-type : 5715.57), signe de profonds écarts entre pays pollueurs et non-pollueurs.
-
+Émissions de CO2 : moyenne élevée (571,4) masquée par une dispersion exceptionnelle, signe de profonds écarts entre pays pollueurs et non-pollueurs.
 Consommations d'énergies renouvelables : Part moyenne de 32,6% mais médiane à 24,2% confirme que peu de pays dépassent les 50% de mix renouvelable.
 
 Espérance de vie : Bon niveau général (72,3 ans) avec une distribution relativement homogène entre pays.
@@ -364,6 +363,17 @@ hist(data_t$nb_cata_naturelles, main = "Répartition des nombres de catastrophes
 
 hist(data_t$precipitations, main = "Répartition de la hauteurs moyenne des precipitations", xlab = "precipitation moyennes",ylab="Effectif")
 ```
+Les histogrammes nous montrent comment les 176 pays se répartissent sur chaque indicateur, ce qui donne du sens aux extrêmes de l'ACP.
+
+taux_mort_inf / esperance_vie : C'est une distribution très inégale (en J inversé). La majorité des pays (plus de 150) ont un taux de mortalité infantile très faible (proche de 0) et une espérance de vie élevée (autour de 70-80 ans). Seule une petite queue de pays (ceux à l'extrême droite de Dim 1 sur l'ACP) tire les moyennes vers le bas. C'est un marqueur fort de la séparation binaire entre pays développés et en grande difficulté.
+
+agriculture / croissance_pop : Ces variables suivent une distribution "normale" ou légèrement asymétrique, centrée sur des valeurs faibles (moins de 10% pour l'agriculture, croissance autour de 0-2%). Leurs valeurs extrêmes (fortement positives, à droite sur l'ACP) sont donc le fait d'une minorité de pays.
+
+croissance_pib : La grande majorité est centrée sur 0-5%. Les rares pics extrêmes (positifs ou négatifs) montrent que la performance économique est très volatile ou qu'elle est due à des événements exceptionnels (ceux que l'Axe 3 isole).
+
+energie_renouv / surface_fores : Ces distributions sont relativement plates, montrant que les pays se répartissent sur tout le spectre (il y a des pays très boisés et peu boisés, et des pays avec peu et beaucoup d'énergies renouvelables).
+
+nb_cata_naturelles / emissions_co2 : Ces distributions sont fortement asymétriques (la majorité des pays n'ont presque pas de catastrophes ou d'émissions faibles). Les outliers (pays développés, grands, ou fortement pollueurs) sont ceux qui créent les petites barres à droite.
 
 # Boite à moustache de tou les indicateurs (les points representent les pays)
 ```{r}
@@ -381,10 +391,7 @@ get_stats <- function(df, var) {
  
   x <- df[[var]]
  
-  # Quartiles
-  q1 <- quantile(x, 0.25, na.rm = TRUE)
-  q3 <- quantile(x, 0.75, na.rm = TRUE)
- 
+
   # valeurs exactes
   vmin <- min(x, na.rm = TRUE)
   vmax <- max(x, na.rm = TRUE)
@@ -393,15 +400,13 @@ get_stats <- function(df, var) {
   # pays associés
   pmin   <- df$pays[which.min(x)]
   pmax   <- df$pays[which.max(x)]
-  pq1    <- df$pays[which.min(abs(x - q1))]
-  pq3    <- df$pays[which.min(abs(x - q3))]
   pmean  <- df$pays[which.min(abs(x - mean_val))]
  
   data.frame(
     variable = var,
-    type = c("Min", "Q1", "Moyenne", "Q3", "Max"),
-    valeur = c(vmin, q1, x[which.min(abs(x - mean_val))], q3, vmax),
-    pays = c(pmin, pq1, pmean, pq3, pmax)
+    type = c("Min",  "Moyenne",  "Max"),
+    valeur = c(vmin, mean_val, vmax),
+    pays = c(pmin,  pmean, pmax)
   )
 }
 
@@ -415,8 +420,9 @@ for (var in indicateurs) {
  
   boxplot(data_scaled_df[[var]],
           main = paste("Distribution de", var),
-          ylab = "Valeur standardisée")
- 
+          ylab = "Valeur standardisée",
+          xlim = c(0.7, 1.8))
+
   # On sélectionne uniquement les stats du bon indicateur
   d <- stats_all[stats_all$variable == var, ]
  
@@ -457,6 +463,11 @@ ggpairs(
     upper = list(continuous = wrap("cor", method = "spearman", size = 3))
 )
 ```
+
+Interprètation: (Boite a moustache): Nous remarquons qu'on observe des valeurs aberantes pour l'indicateurs de l'emission de co2 
+(Boxplot): Le nuage de points des indicateurs n'est pas très visible donc nous allons l'ameliorer
+(Matrice de Corrélation) 
+Ce graphique montre les coefficients de corrélation entre les indicateurs. La couleur et l'intensité indiquent la force et la direction de la corrélation : le bleu foncé représente une forte corrélation positive (proche de +1), et le rouge foncé une forte corrélation négative (proche de -1). Le blanc indique une corrélation faible ou nulle (proche de 0)
 # interpretation des corrélations avec les nuages de points :
 
 # Corrélations fortes
@@ -496,6 +507,7 @@ Corr : –0.923*** (la plus forte du graphique)
 Nuage : ligne très serrée, fortement décroissante.
 -> Interprétation : quand l'espérance de vie diminue, le taux de mortailité infantile augmente fortement.
 Relation quasi-linéaire -> indicateurs très liés.
+
 
 
 Corrélogramme
@@ -644,6 +656,7 @@ plot.PCA(acp,axes=c(3,4),choix="var")
 # Nuage des pays (individus)
 plot.PCA(acp,axes=c(3,4),choix="ind")
 ```
+
 L'analyse des valeurs propres permet de déterminer combien d'axes (dimensions) sont réellement informatifs et doivent être retenus pour l'interprétation.
         eigenvalue            percentage of variance               cumulative percentage of variance
 comp 1  4.14524731             37.6840664                          37.68407
@@ -667,8 +680,37 @@ Dominance de la Dim 1 : La première dimension est de loin la plus importante, c
 #--------- Interprétation du Plan 1/2 (Dim 1 vs Dim 2) ---------#
 
 # Cercle des Corrélations (Variables)
+1.Plan Principal : Dim 1 (37.68%) vs Dim 2 (17.70%)
+Ce plan capture l'opposition fondamentale de nos données :
 
+Axe 1 (Développement Humain et Infrastructures) :
 
+Pôle Gauche (Développement Élevé) : Caractérisé par les vecteurs electricite et esperance_vie. Ces variables pointent clairement vers la gauche, définissant le pôle des pays avec des infrastructures de qualité et un fort bien-être. Les variables emissions_co2 et nb_cata_naturelles sont également orientées vers la gauche, indiquant que les pays développés sont, en général, les plus impactés par ces facteurs.
+
+Pôle Droit (Défis Démographiques et Ruraux) : Fortement défini par agriculture et taux_mort_inf. Ces variables sont opposées à l'axe du développement, caractérisant les pays où l'économie est agricole et les défis de santé publique sont majeurs. croissance_pop est également de ce côté, tirant vers le bas.
+
+Axe 2 (Environnemental / Croissance) :
+
+Pôle Haut (Forte Dynamique Économique / Précipitations) : Dominé par precipitations et surface_fores. Ce pôle est lié aux ressources naturelles et à la croissance_pib, qui est orientée vers le haut.
+
+Pôle Bas (Pays Pollueurs) : Fortement défini par emissions_co2 et croissance_pop, qui pointent vers le bas. Cela sépare les pays avec une forte pression démographique et/ou une forte empreinte carbone des autres.
+
+2.Plan Secondaire : Dim 3 (9.69%) vs Dim 4 (9.05%)
+Ce plan isole des facteurs de singularité et de risque :
+
+Axe 3 (Croissance Spécifique) :
+
+Pôle Droit : Fortement dominé par la croissance_pib. Cet axe isole les pays dont la performance est presque uniquement dictée par une dynamique économique forte.
+
+Pôle Gauche : Oppose la croissance à la vulnérabilité (caractérisé par nb_cata_naturelles et emissions_co2).
+
+Axe 4 (Risque / Vulnérabilité) :
+
+Pôle Haut : Fortement défini par nb_cata_naturelles et croissance_pop. C'est un axe de la vulnérabilité combinant les risques naturels et la pression démographique.
+
+Pôle Bas : La variable electricite est orientée vers le bas, s'opposant faiblement au facteur de risque.
+
+Les deux premiers axes capturent le contraste principal : Développement vs Défis Ruraux/Démographiques. Les axes 3 et 4 affinent l'analyse en identifiant les facteurs de croissance exceptionnelle et de vulnérabilité environnementale.
 #Amelioration du nuage des individus
 Il y a trop d'individus concentrés au centre, rendant l'identification des pays difficile. De plus, les axes 3 et 4 expliquent moins de variance, il est préférable de se concentrer sur les axes 1 et 2.
 
@@ -694,6 +736,28 @@ ggplot(ind_coords, aes(x = Dim1, y = Dim2, label = Pays)) +
   ) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+1. Le Bloc de l'Excellence (Gauche, Dim 1 < 0)
+C'est le cluster du Développement Élevé (fortes electricite et esperance_vie).
+
+Les Modèles (Haut-Gauche) : Pays comme JPN, KOR, ISL, et la plupart des pays d'Europe de l'Ouest (FRA, NLD, BEL). Ils affichent les meilleurs indicateurs de bien-être et sont relativement équilibrés sur l'axe de l'impact environnemental.
+
+Les Riches Pollueurs (Bas-Gauche) : C'est le cluster des pays développés mais pénalisés par l'Axe 2 (Pôle Pollueur). QAT (Qatar) est l'outlier absolu du graphique, tiré vers le bas de manière spectaculaire par l'impact de ses emissions_co2 et/ou une croissance démographique extrême. KWT et ARE le suivent de près. Leurs indices de développement ne cachent pas leur énorme empreinte.
+
+2. Le Bloc des Défis Structurels (Droite, Dim 1 > 0)
+C'est le cluster de l'Agriculture et des Défis Démographiques et Ruraux (taux de mortalité infantile élevé).
+
+Les Outliers de la Pauvreté (Extrême Droite) : CAF (Centrafrique) est le pays le plus isolé et le plus à droite, symbolisant le niveau le plus bas sur l'axe du Développement. SOM (Somalie) et NER (Niger) sont aussi très à droite et tirés vers le bas par une forte pression démographique. C'est la zone où les indicateurs d'infrastructures et de bien-être sont les plus faibles.
+
+Le Groupe en Difficulté : Une majorité de pays d'Afrique sub-saharienne (MLI, ETH, TCD, BDI, UGA) et d'Haïti (HTI) se concentrent dans cette zone.
+
+3. Le Centre et la Transition (Autour de l'Origine)
+C'est la vaste majorité. Ces pays ont des profils d'indicateurs mélangés, souvent avec une croissance_pib modérée mais des défis dans d'autres domaines.
+
+On y trouve la majorité de l'Amérique du Sud (BRA, ARG, COL) et une grande partie de l'Asie (hors Extrême-Orient).
+
+Le graphique montre que le facteur Développement (Axe 1) est la principale source de disparité, suivi de la Pression Environnementale (Axe 2) qui crée une scission même au sein des pays riches.
+
 #Avec geom_text_repel(), les labels ne se chevauchent presque jamais et tu peux identifier facilement les pays concentrés au centre.
 
 
@@ -733,7 +797,6 @@ Le graphique montre comment les pays sont progressivement regroupés, des plus s
 On observe deux branches principales qui se rejoignent très haut (autour de 25), suggérant deux grands ensembles initiaux de pays. Il y a ensuite des sous-groupes qui se forment à des hauteurs inférieures (autour de 15, puis 5)
 le graphique est trop encombré pour permettre une analyse précise nous allonsprocéder a une amelioration.
 
-
 # Amelioration
 ```{r}
 # install.packages(c("factoextra", "cluster"))
@@ -754,6 +817,7 @@ fviz_dend(cah,
 ```
 Ce graphique est la visualisation réussie de la segmentation des 176 pays en cinq groupes distincts et compacts
 Les cinq couleurs (bleu foncé, jaune, rouge, bleu clair, etc.) et les rectangles mis en évidence correspondent aux 5 classes de pays.
+Lorsque nous augmentont la valeurs de k à 7 la classe en bleu clair ne se partitionne pas mais si l'on augmente à 10 elle se scinde mais en de petits groupe ce qui rends les classes moins distinctes. 
 
 Partition en 5 classes
 ```{r}
@@ -938,58 +1002,116 @@ m_pluie
 
 
 #----------- Analyse temporelle : évolution des émissions de C02 ---------------
-# Exemple pour 2 pays (France et USA)
-
 Extraction des données
 ```{r}
-#emissions_C02
-CO2_USA=emissions_co2[emissions_co2$Country.Code=="USA",33:55]
-CO2_FRA=emissions_co2[emissions_co2$Country.Code=="FRA",33:55]
-CO2_QAT=emissions_co2[emissions_co2$Country.Code=="QAT",33:55] # d'après la boite à moustache, c'est le pays (Qatar) qui emet le plus de Co2
-CO2_SOM=emissions_co2[emissions_co2$Country.Code=="SOM",33:55] # d'après la boite à moustache, c'est le pays (Somalie) qui emet le moins de Co2
+# 1. Chargement des librairies (si ce n'est pas fait)
+library(ggplot2)
+library(tidyr) # Pour pivot_longer
+
+CO2_CHN <- emissions_co2[emissions_co2$Country.Code=="CHN", 33:55]
+CO2_FRA <- emissions_co2[emissions_co2$Country.Code=="FRA", 33:55]
+CO2_NGA <- emissions_co2[emissions_co2$Country.Code=="NGA", 33:55]
 
 
-serie_CO2=data.frame(annee=2000:2022,CO2_USA=t(CO2_USA),CO2_FRA=t(CO2_FRA),CO2_QAT=t(CO2_QAT),CO2_SOM=t(CO2_SOM))
-```
+serie_CO2_large <- data.frame(
+    annee = 2000:2022,
+    CO2_CHN = as.vector(t(CO2_CHN)), 
+    CO2_FRA = as.vector(t(CO2_FRA)),
+    CO2_NGA = as.vector(t(CO2_NGA))
+  
+)
 
-
-```{r}
-ggplot(data=serie_CO2,aes(x=annee,y=serie_CO2$X252))+
-  geom_line(aes(color="USA"))+
-  geom_line(aes(y=serie_CO2$X78,color="France"))+
-  labs(title = "Évolution des émissions de CO2", x = "Année", y = "Variation des émissions (%)", color = "Pays")
+# 4. Conversion au format long (nécessaire pour ggplot)
+serie_CO2_long <- serie_CO2_large %>%
+    pivot_longer(
+        cols = starts_with("CO2_"), 
+        names_to = "Pays",        
+        values_to = "Emissions_CO2" 
+    )
+ggplot(data = serie_CO2_long, aes(x = annee, y = Emissions_CO2, color = Pays)) +
+    geom_line(linewidth = 1) +
+    labs(
+        title = "Évolution des émissions de CO2 par pays (2000-2022)",
+        x = "Année",
+        y = "Émissions de CO2", # Je suppose que c'est une valeur absolue et non une variation en %
+        color = "Pays"
+    ) +
+    theme_minimal()
 # Emissions de Co2 en KgCo2eq/hab
 ```
-L’évolution des émissions de CO2 montre des tendances contrastées mais globalement décroissantes sur la période étudiée pour la France et les États‑Unis, avec plusieurs variations intermédiaires. Pour la France (ligne rouge), les émissions ont commencé légèrement au-dessus de 4 % en 2002, ont diminué progressivement jusqu’à atteindre environ -25 % en 2020, avant de remonter légèrement à environ -19 % en 2022. Cette baisse importante traduit une réduction globale des émissions, probablement liée à des politiques énergétiques et environnementales plus strictes, bien que les fluctuations indiquent des variations annuelles dues à différents facteurs économiques ou climatiques. Pour les États‑Unis (ligne bleue), les émissions ont démarré plus haut, autour de 18 % en 2002, puis ont également diminué pour atteindre environ -10 % en 2020, avant de remonter légèrement à près de 6 % en 2022. Ici encore, la tendance générale est à la baisse, mais les variations montrent que la trajectoire n’est pas linéaire et qu’elle est influencée par des cycles économiques, des événements spécifiques et des politiques de réduction des émissions.
 
-avec le confinement (covid) il y'a une chute du a l'inactivite
 
-En résumé, la diminution des émissions sur le long terme montre un effort de réduction de la pollution carbone, mais les oscillations annuelles indiquent que ces efforts sont sensibles aux conditions économiques et aux choix politiques.
-
+#j'ai enlever le commentaire puisque je ne savais pas quel pays garder au final
 
 # --- Analyse temporelle : Surface forestière ---
 ```{r}
+library(ggplot2)
+library(tidyr)
+library(dplyr) # Ajouté car pipe (%>%) est souvent inclus dans tidyverse
+
+# 1. Extraction des données (USA et France)
+# Je suppose que les indices 45:67 correspondent aux années 2000 à 2022
+# 1. Extraction des données (Surface Forestière uniquement)
 FOR_USA <- surface_fores[surface_fores$Country.Code == "USA", 45:67]
 FOR_FRA <- surface_fores[surface_fores$Country.Code == "FRA", 45:67]
-serie_FOR <- data.frame(annee = 2000:2022, FOR_USA = t(FOR_USA), FOR_FRA = t(FOR_FRA))
+FOR_NGA <- surface_fores[surface_fores$Country.Code == "NGA", 45:67] # Ajout de l'Allemagne
+
+# 2. Création du data.frame "large"
+serie_FOR_large <- data.frame(
+    annee = 2000:2022,
+    FOR_USA = as.vector(t(FOR_USA)), 
+    FOR_FRA = as.vector(t(FOR_FRA)),
+    FOR_NGA = as.vector(t(FOR_NGA)) # La colonne est maintenant en FOR_
+)
+
+# 3. Conversion au format long (Le filtre "FOR_" fonctionne maintenant pour les 3 pays)
+serie_FOR_long <- serie_FOR_large %>%
+    pivot_longer(
+        cols = starts_with("FOR_"), 
+        names_to = "Pays",        
+        values_to = "Surface_Forestiere" 
+    )
+
+# 4. Visualisation (le graphique affichera 3 lignes)
+ggplot(data = serie_FOR_long, aes(x = annee, y = Surface_Forestiere, color = Pays)) +
+    geom_line(linewidth = 1) +
+    labs(
+        title = "Évolution des surfaces forestières par pays (2000-2022)",
+        x = "Année",
+        y = "Surface forestière (% du territoire)",
+        color = "Pays"
+    ) +
+    theme_minimal()
 ```
 
-```{r}
-ggplot(data = serie_FOR, aes(x = annee,y=X252)) +
-  geom_line(aes(color = "USA")) +
-  geom_line(aes(y=X78, color = "France")) +
-  labs(title = "Évolution des surfaces forestières", x = "Année", y = "Surface forestière (% du territoire)", color = "Pays")
-```
-L’évolution des surfaces forestières, mesurée en pourcentage du territoire, présente des tendances différentes pour la France et les États‑Unis. Pour la France (ligne rouge), la surface forestière commence à environ 79 % en 2000 et reste relativement stable jusqu’en 2003. Ensuite, elle connaît une légère augmentation avec quelques variations, atteignant environ 82,5 % entre 2013 et 2018, avant de diminuer légèrement pour se stabiliser autour de 82 % en 2022. Cela montre une tendance générale à l’expansion ou à la stabilité des forêts françaises sur la période, avec des variations modérées probablement liées à la gestion forestière et aux activités humaines.
-
-Pour les États‑Unis (ligne bleue), la surface forestière commence à environ 76,5 % en 2000 et augmente légèrement pour atteindre 79 % en 2019. Elle diminue ensuite pour revenir à 76,5 % en 2021, puis remonte légèrement jusqu’à environ 77 % en 2022. Ces variations modérées suggèrent que la surface forestière aux États‑Unis reste globalement stable, mais qu’elle peut être influencée par les cycles de reboisement, les activités humaines ou les variations de mesure.
-
-Activité modernetr genere l'artificialisation des sols, la construction des mines, datacenters, etc,... tout ca, entraine la deforestation
-sols artificialisées (etanche ) - voir si c'est lié à la déforestation ou l'inverse
-
-Résumé : La France montre une surface forestière stable et légèrement croissante autour de 82 %, tandis que les États‑Unis présentent des fluctuations plus modérées autour de 77 %. Dans les deux cas, la couverture forestière reste relativement constante, mais chaque pays connaît des variations temporaires liées à des facteurs naturels ou causés par l’homme.
 
 # Faire de la prévision (modélisation) avec la fonction predict
+```{r}
+# 1. Préparer les données pour la France
+data_FRA <- serie_FOR_long %>% 
+    filter(Pays == "FOR_FRA") %>%
+    select(annee, Surface_Forestiere)
+
+# 2. Entraîner le modèle de régression linéaire (lm)
+# Le modèle essaie de trouver la relation : Surface_Forestiere = a * annee + b
+modele_FRA <- lm(Surface_Forestiere ~ annee, data = data_FRA)
+
+# Créer un nouveau data.frame avec les années à prédire
+nouvelles_annees <- data.frame(annee = 2023:2025)
+# Effectuer la prévision
+predictions_FRA <- predict(
+    object = modele_FRA,        # Le modèle entraîné (lm dans cet exemple)
+    newdata = nouvelles_annees  # Les données pour lesquelles on veut prédire
+)
+# Combiner les prévisions avec les années
+resultat_prevision <- data.frame(
+    annee = nouvelles_annees$annee, 
+    Surface_Forestiere_Predite = predictions_FRA
+)
+
+print(resultat_prevision)
+```
+
 
 # --- Modélisation simple sur les émissions de CO2 ---
 Modélisation linéaire
@@ -1015,5 +1137,3 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
-
-
