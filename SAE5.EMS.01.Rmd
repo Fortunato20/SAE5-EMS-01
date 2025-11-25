@@ -328,7 +328,8 @@ Croissance du PIB : Taux moyen positif de 3,2%, cependant la présence de valeur
 
 Croissance de la population : en moyenne la population croit de 1.2%, ce qui est assez modéré. Avec une distribution assez homogène entre les pays.
 
-Émissions de CO2 : moyenne élevée (571,4) masquée par une dispersion exceptionnelle, signe de profonds écarts entre pays pollueurs et non-pollueurs.
+Émissions de CO2 : moyenne élevée (4329.07 KGCo2eq/hab) masquée par une dispersion exceptionnelle (ecart-type : 5715.57), signe de profonds écarts entre pays pollueurs et non-pollueurs.
+
 Consommations d'énergies renouvelables : Part moyenne de 32,6% mais médiane à 24,2% confirme que peu de pays dépassent les 50% de mix renouvelable.
 
 Espérance de vie : Bon niveau général (72,3 ans) avec une distribution relativement homogène entre pays.
@@ -338,6 +339,7 @@ Surface foréstiere : en moyenne les pays ont 31,9% de leur territoire qui est r
 Taux de mortalité infantile : Il y'a en moyenne 27 à 28 déces d'enfants de moins de 5 ans sur 1000 enfants par pays, avec une grande dispersion selon les pays (ecart-type : 37.7)
 
 Catastrophes naturelles : 2,4 catastrophes naturelles en moyenne par pays, mais avec une occurrence très inégale selon les régions.
+
 
 # Quelques Histogrammes sur les indicateurs  
 ```{r}
@@ -375,7 +377,8 @@ energie_renouv / surface_fores : Ces distributions sont relativement plates, mon
 
 nb_cata_naturelles / emissions_co2 : Ces distributions sont fortement asymétriques (la majorité des pays n'ont presque pas de catastrophes ou d'émissions faibles). Les outliers (pays développés, grands, ou fortement pollueurs) sont ceux qui créent les petites barres à droite.
 
-# Boite à moustache de tou les indicateurs (les points representent les pays)
+
+# Boite à moustache de tous les indicateurs (les points representent les pays)
 ```{r}
 library(dplyr)
 
@@ -391,7 +394,6 @@ get_stats <- function(df, var) {
  
   x <- df[[var]]
  
-
   # valeurs exactes
   vmin <- min(x, na.rm = TRUE)
   vmax <- max(x, na.rm = TRUE)
@@ -438,6 +440,160 @@ for (var in indicateurs) {
 }
 ```
 
+# Importation de la carte monde
+
+Maintenant Nous souhaitons visualiser les dans leur contexte géographique. La fusion des données statistiques avec les données géographiques (via left_join) nous permet de créer des cartes  
+```{r}
+monde <- st_read("monde.shp") 
+head(monde)
+dim(monde)
+```
+longitude et latitude represente le centroïde du pays
+
+#Fusion des données importantes à celle de la carte
+```{r}
+monde_data <- left_join(monde, data_t, by=c("ISO3" = "ISO")) # On fusionne les données des indicateurs avec la carte via le code ISO3
+head(monde_data)
+dim(monde)
+dim(monde_data)
+# write.csv(monde_data, file = "monde_data.csv", row.names = TRUE)
+```
+
+
+#Carte leaflet
+C'est la carte leaflet pour presenter tout les pays ou on a la valeur de l'electricité
+
+```{r}
+library(leaflet) 
+library(dplyr) # Nécessaire pour la fonction filter()
+
+# Définir l'indicateur
+indicateur_a_afficher <- "electricite"
+
+# --- FILTRAGE : Supprimer les pays où 'electricite' est NA ---
+monde_data_filtre <- monde_data %>%
+  filter(!is.na(electricite))
+
+# --- Création de la palette de couleurs (basée sur le jeu de données filtré) ---
+palette_electricite <- colorNumeric(
+  # Palette séquentielle (du clair au foncé, donc du petit au grand)
+  palette = "Blues", 
+  # Domaine basé sur les données NON-NA
+  domain = monde_data_filtre$electricite
+  # On n'a plus besoin de na.color puisque les NA sont filtrés
+)
+
+# --- Création de la Carte Leaflet Modifiée ---
+m_sans_na <- leaflet(data = monde_data_filtre) %>% # ATTENTION : Utilise le jeu de données filtré
+  
+  # 1. Ajouter le fond de carte
+  addProviderTiles("CartoDB.Positron") %>% 
+  
+  # 2. Ajouter les marqueurs circulaires avec COULEUR DYNAMIQUE
+  addCircleMarkers(
+    ~LON, ~LAT, 
+    radius = 5,
+    # Utilisation de la palette
+    color = ~palette_electricite(electricite), 
+    fillOpacity = 0.8,
+    stroke = FALSE, 
+    
+    # Définir le contenu du pop-up
+    popup = ~paste0(
+      "<b>Pays:</b> ", NAME, "<br>",
+      "<b>", indicateur_a_afficher, ":</b> ", electricite, "%"
+    ),
+    
+    # Définir le contenu du label
+    label = ~NAME,
+    labelOptions = labelOptions(
+      style = list("font-weight" = "bold", "padding" = "3px 8px"),
+      textsize = "15px",
+      direction = "auto"
+    )
+  ) %>%
+  
+  # 3. AJOUT DE LA LÉGENDE
+  addLegend(
+    pal = palette_electricite,
+    values = ~electricite, # Les valeurs pour lesquelles la légende est générée
+    title = "Accès à l'électricité (%)",
+    position = "bottomright",
+    opacity = 1
+  )
+
+# Afficher la carte
+m_sans_na
+
+# couleur des pays en fonction de la classe, pour pouvoir zoomer pour voir la classe
+# renderleaflet a la place de renderplot dans shiny pour mettre la carte 
+```
+
+# Carte leaflet pour representer la hauteur moyenne des précipitations des pays
+```{r}
+library(leaflet) 
+library(dplyr) # Nécessaire pour la fonction filter()
+
+# --- NOUVEL INDICATEUR : Précipitations (mm/an) ---
+indicateur_a_afficher <- "precipitations"
+unite <- " mm/an" # Nouvelle unité pour le pop-up et la légende
+
+# --- FILTRAGE : Supprimer les pays où 'precipitations' est NA ---
+monde_data_filtre <- monde_data %>%
+  filter(!is.na(precipitations))
+
+# --- Création de la palette de couleurs ---
+# J'utilise 'YlGnBu' (Yellow-Green-Blue) : clair pour les faibles précipitations, foncé pour les fortes.
+palette_pluie <- colorNumeric(
+  palette = "YlGnBu", 
+  # Domaine basé sur les données NON-NA de 'precipitations'
+  domain = monde_data_filtre$precipitations
+)
+
+# --- Création de la Carte Leaflet Modifiée ---
+m_pluie <- leaflet(data = monde_data_filtre) %>% # Utilise le jeu de données filtré
+  
+  # 1. Ajouter le fond de carte
+  addProviderTiles("CartoDB.Positron") %>% 
+  
+  # 2. Ajouter les marqueurs circulaires avec COULEUR DYNAMIQUE
+  addCircleMarkers(
+    ~LON, ~LAT, 
+    radius = 5,
+    # Utilisation de la nouvelle palette 'pluie'
+    color = ~palette_pluie(precipitations), 
+    fillOpacity = 0.8,
+    stroke = FALSE, 
+    
+    # 3. Définir le contenu du pop-up
+    popup = ~paste0(
+      "<b>Pays:</b> ", NAME, "<br>",
+      "<b>", indicateur_a_afficher, ":</b> ", precipitations, unite
+    ),
+    
+    # 4. Définir le contenu du label
+    label = ~NAME,
+    labelOptions = labelOptions(
+      style = list("font-weight" = "bold", "padding" = "3px 8px"),
+      textsize = "15px",
+      direction = "auto"
+    )
+  ) %>%
+  
+  # 5. AJOUT DE LA LÉGENDE
+  addLegend(
+    pal = palette_pluie,
+    values = ~precipitations, # Les valeurs pour lesquelles la légende est générée
+    title = "Précipitations annuelles (mm)",
+    position = "bottomright",
+    opacity = 1
+  )
+
+# Afficher la carte
+m_pluie
+# la ligne equatoriale est plus arosée (tropic nord plus de precipitations que le sud)
+```
+
 
 # Diagramme de corrélation 
 ```{r, warning=FALSE,message=FALSE}
@@ -463,12 +619,7 @@ ggpairs(
     upper = list(continuous = wrap("cor", method = "spearman", size = 3))
 )
 ```
-
-Interprètation: (Boite a moustache): Nous remarquons qu'on observe des valeurs aberantes pour l'indicateurs de l'emission de co2 
-(Boxplot): Le nuage de points des indicateurs n'est pas très visible donc nous allons l'ameliorer
-(Matrice de Corrélation) 
-Ce graphique montre les coefficients de corrélation entre les indicateurs. La couleur et l'intensité indiquent la force et la direction de la corrélation : le bleu foncé représente une forte corrélation positive (proche de +1), et le rouge foncé une forte corrélation négative (proche de -1). Le blanc indique une corrélation faible ou nulle (proche de 0)
-# interpretation des corrélations avec les nuages de points :
+# Interpretation des corrélations avec les nuages de points :
 
 # Corrélations fortes
 - Electricité et énergie renouvelable : 
@@ -507,7 +658,6 @@ Corr : –0.923*** (la plus forte du graphique)
 Nuage : ligne très serrée, fortement décroissante.
 -> Interprétation : quand l'espérance de vie diminue, le taux de mortailité infantile augmente fortement.
 Relation quasi-linéaire -> indicateurs très liés.
-
 
 
 Corrélogramme
@@ -609,25 +759,6 @@ ggplot(df, aes(x = electricite, y = croissance_pib, label = pays)) +
 
 
 
-# Importation de la carte monde
-
-Maintenant que nous connaissons les caractéristiques de nos données, nous voulons les visualiser dans leur contexte géographique. La fusion des données statistiques avec les données géographiques (via left_join) nous permet de créer des cartes 
-```{r}
-monde <- st_read("monde.shp") 
-head(monde)
-dim(monde)
-```
-longitude et latitude represente le centroïde du pays
-
-#Fusion des données importantes à celle de la carte
-```{r}
-monde_data <- left_join(monde, data_t, by=c("ISO3" = "ISO")) # On fusionne les données des indicateurs avec la carte via le code ISO3
-head(monde_data)
-dim(monde)
-dim(monde_data)
-# write.csv(monde_data, file = "monde_data.csv", row.names = TRUE)
-```
-
 # ACP
 
 Préparation du tableau
@@ -647,7 +778,7 @@ Le jeu de données initial pour l'ACP contient 246 observations (lignes,  pays/t
 Il contient 11 variables (colonnes, les indicateurs numériques).
 
 
-# ACP
+# Réalisation de l'ACP
 ```{r}
 acp=PCA(dACP)
 acp$eig
@@ -865,139 +996,6 @@ legend(-170,0,paste("CL",1:k,sep=""),fill=1:k, bty="n",title="Classes de pays",c
 ```
 La carte montre une forte concentration géographique des classes, les pays développés (Classe 1, Noir) dominent l'Amérique, l'Europe de l'Ouest et l'Australie, contrastant fortement avec les pays les moins développés et ruraux (Classe 3, Vert) qui sont regroupés majoritairement en Afrique subsaharienne et en Asie du Sud.
 
-#Carte leaflet
-C'est la carte leaflet pour presenter tout les pays ou on a la valeur de l'electricité
-
-```{r}
-library(leaflet) 
-library(dplyr) # Nécessaire pour la fonction filter()
-
-# Définir l'indicateur
-indicateur_a_afficher <- "electricite"
-
-# --- FILTRAGE : Supprimer les pays où 'electricite' est NA ---
-monde_data_filtre <- monde_data %>%
-  filter(!is.na(electricite))
-
-# --- Création de la palette de couleurs (basée sur le jeu de données filtré) ---
-palette_electricite <- colorNumeric(
-  # Palette séquentielle (du clair au foncé, donc du petit au grand)
-  palette = "Blues", 
-  # Domaine basé sur les données NON-NA
-  domain = monde_data_filtre$electricite
-  # On n'a plus besoin de na.color puisque les NA sont filtrés
-)
-
-# --- Création de la Carte Leaflet Modifiée ---
-m_sans_na <- leaflet(data = monde_data_filtre) %>% # ATTENTION : Utilise le jeu de données filtré
-  
-  # 1. Ajouter le fond de carte
-  addProviderTiles("CartoDB.Positron") %>% 
-  
-  # 2. Ajouter les marqueurs circulaires avec COULEUR DYNAMIQUE
-  addCircleMarkers(
-    ~LON, ~LAT, 
-    radius = 5,
-    # Utilisation de la palette
-    color = ~palette_electricite(electricite), 
-    fillOpacity = 0.8,
-    stroke = FALSE, 
-    
-    # Définir le contenu du pop-up
-    popup = ~paste0(
-      "<b>Pays:</b> ", NAME, "<br>",
-      "<b>", indicateur_a_afficher, ":</b> ", electricite, "%"
-    ),
-    
-    # Définir le contenu du label
-    label = ~NAME,
-    labelOptions = labelOptions(
-      style = list("font-weight" = "bold", "padding" = "3px 8px"),
-      textsize = "15px",
-      direction = "auto"
-    )
-  ) %>%
-  
-  # 3. AJOUT DE LA LÉGENDE
-  addLegend(
-    pal = palette_electricite,
-    values = ~electricite, # Les valeurs pour lesquelles la légende est générée
-    title = "Accès à l'électricité (%)",
-    position = "bottomright",
-    opacity = 1
-  )
-
-# Afficher la carte
-m_sans_na
-
-# couleur des pays en fonction de la classe, pour pouvoir zoomer pour voir la classe
-# renderleaflet a la place de renderplot dans shiny pour mettre la carte 
-```
-
-C'est la carte leaflet pour presenté tout les pays ou on a la valeur de la hauteur moyenne des précipitations 
-```{r}
-library(leaflet) 
-library(dplyr) # Nécessaire pour la fonction filter()
-
-# --- NOUVEL INDICATEUR : Précipitations (mm/an) ---
-indicateur_a_afficher <- "precipitations"
-unite <- " mm/an" # Nouvelle unité pour le pop-up et la légende
-
-# --- FILTRAGE : Supprimer les pays où 'precipitations' est NA ---
-monde_data_filtre <- monde_data %>%
-  filter(!is.na(precipitations))
-
-# --- Création de la palette de couleurs ---
-# J'utilise 'YlGnBu' (Yellow-Green-Blue) : clair pour les faibles précipitations, foncé pour les fortes.
-palette_pluie <- colorNumeric(
-  palette = "YlGnBu", 
-  # Domaine basé sur les données NON-NA de 'precipitations'
-  domain = monde_data_filtre$precipitations
-)
-
-# --- Création de la Carte Leaflet Modifiée ---
-m_pluie <- leaflet(data = monde_data_filtre) %>% # Utilise le jeu de données filtré
-  
-  # 1. Ajouter le fond de carte
-  addProviderTiles("CartoDB.Positron") %>% 
-  
-  # 2. Ajouter les marqueurs circulaires avec COULEUR DYNAMIQUE
-  addCircleMarkers(
-    ~LON, ~LAT, 
-    radius = 5,
-    # Utilisation de la nouvelle palette 'pluie'
-    color = ~palette_pluie(precipitations), 
-    fillOpacity = 0.8,
-    stroke = FALSE, 
-    
-    # 3. Définir le contenu du pop-up
-    popup = ~paste0(
-      "<b>Pays:</b> ", NAME, "<br>",
-      "<b>", indicateur_a_afficher, ":</b> ", precipitations, unite
-    ),
-    
-    # 4. Définir le contenu du label
-    label = ~NAME,
-    labelOptions = labelOptions(
-      style = list("font-weight" = "bold", "padding" = "3px 8px"),
-      textsize = "15px",
-      direction = "auto"
-    )
-  ) %>%
-  
-  # 5. AJOUT DE LA LÉGENDE
-  addLegend(
-    pal = palette_pluie,
-    values = ~precipitations, # Les valeurs pour lesquelles la légende est générée
-    title = "Précipitations annuelles (mm)",
-    position = "bottomright",
-    opacity = 1
-  )
-
-# Afficher la carte
-m_pluie
-# la ligne equatoriale est plus arosée (tropic nord plus de precipitations que le sud)
-```
 
 
 
@@ -1137,3 +1135,4 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
