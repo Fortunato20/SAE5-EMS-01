@@ -341,7 +341,7 @@ Taux de mortalité infantile : Il y'a en moyenne 27 à 28 déces d'enfants de mo
 Catastrophes naturelles : 2,4 catastrophes naturelles en moyenne par pays, mais avec une occurrence très inégale selon les régions.
 
 
-# Quelques Histogrammes sur les indicateurs  
+#  Histogrammes sur les indicateurs  
 ```{r}
 hist(data_t$electricite, main = "Répartition de l'accès à l'électricité", xlab = "Accés à l'électricité (% de la population)",ylab="Effectif")
 
@@ -373,6 +373,7 @@ Il y'a une minorite de pays qui ont une part de consommation d'energie renouvela
 
 - Sur la répartition des surfaces forestières, La variable montre une hétérogénéité structurelle. L'échantillon comprend un grand groupe de pays avec une très faible couverture forestière, moins de 20%, (potentiellement des zones arides ou très défrichées) et un groupe secondaire significatif (40%  peu pres) avec une couverture modérée/saine. Les entités avec une très forte couverture (>80%) sont anecdotiques.
 
+- sur la repartition des taux de mortalité infantile,la majorité des pays ont un taux de mortalité infantile faible, souvent en dessous de 50. Par contre, quelques pays ont des taux très élevés, au-delà de 100, voire proches de 400. Ces valeurs extrêmes tirent la distribution vers la droite. Donc la répartition est très déséquilibrée : beaucoup de pays vont bien, mais quelques-uns sont dans une situation sanitaire vraiment grave.
 
 
 # Boite à moustache de tous les indicateurs (les points representent les pays)
@@ -1154,6 +1155,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
