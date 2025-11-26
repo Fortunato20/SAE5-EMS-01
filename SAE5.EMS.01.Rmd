@@ -623,33 +623,33 @@ ggpairs(
 
 # Corrélations fortes
 - Electricité et énergie renouvelable : 
-Corr : -0,636***
+Corr : -0,633***
 Nuage : pente négative claire, les points descendent progressivement (on observe une dispersion modérée).
 -> Interprétation : plus la part d’électricité augmente, moins la part d’énergie renouvelable augmente. 
 
 - Agriculture et Espérance de vie :
-Corr : -0,753***
+Corr : -0,751***
 Nuage : relation inverse très nette, forme diagonale décroissante (trés peu de dispersion).
 -> Interprétation : un niveau élevé d’agriculture est associé à une faible espérance de vie. 
 Les points sont très alignés -> lien structurel fort.
 
 - Electricité et taux de mortalité infantile : 
-Corr : -0,812***
+Corr : -0,814***
 Nuage : le nuage forme une ligne descendante avec peu de dispersion.
 -> Interprétation : Les pays qui ont le plus accès à l'electricité, ont moins de mortalité infantile.
 
 - Surface forestiere et précipitations :
-Corr : 0,681***
+Corr : 0,685***
 Nuage : le nuage forme une pente positive claire qui descend progressivement avec une dispersion modérée.
 -> Interprétation : Les pays qui ont un plus grand pourcentage de forets sur leur territoire ont aussi plus de précipitations.
 
 - Agriculture et Taux de mortailité infantile :
-Corr : 0,739***
+Corr : 0,737***
 Nuage : ligne ascendante avec peu de dispersion.
 -> Interprétation : les pays avec plus d’agriculture ont aussi un taux de mortalité plus élevé.
 
 - Electricité et Espérance de vie : 
-Corr : 0,806***
+Corr : 0,808***
 Nuage : pente ascendante avec peu de dispersion.
 -> Interprétation : les pays qui ont le accès à l'électricité ont aussi une plus grande esperance de vie 
 
@@ -658,7 +658,6 @@ Corr : –0.923*** (la plus forte du graphique)
 Nuage : ligne très serrée, fortement décroissante.
 -> Interprétation : quand l'espérance de vie diminue, le taux de mortailité infantile augmente fortement.
 Relation quasi-linéaire -> indicateurs très liés.
-
 
 Corrélogramme
 ```{r}
@@ -704,7 +703,6 @@ ggplot(df_plot, aes_string(x = x_var, y = y_var, label = "pays")) +
 ```{r}
 df <- data_t   # Jeu de données propre
 
-
 # Espérance de vie vs Accès à l'électricité
 ggplot(df, aes(x = electricite, y = esperance_vie, label = pays)) +
   geom_point() +
@@ -714,45 +712,6 @@ ggplot(df, aes(x = electricite, y = esperance_vie, label = pays)) +
     title = "Espérance de vie vs Accès à l'électricité",
     x = "Accès à l'électricité (%)",
     y = "Espérance de vie (années)"
-  ) +
-  theme_minimal()
-
-
-# Espérance de vie vs Taux de mortalité infantile (< 5 ans)
-ggplot(df, aes(x = taux_mort_inf, y = esperance_vie, label = pays)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  geom_text_repel(size = 3) +
-  labs(
-    title = "Espérance de vie vs Taux de mortalité infantile",
-    x = "Mortalité infantile (pour 1000 naissances)",
-    y = "Espérance de vie (années)"
-  ) +
-  theme_minimal()
-
-
-#  Émissions Co2 vs Énergie renouvelable 
-ggplot(df, aes(x = energie_renouv, y = emissions_co2, label = pays)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  geom_text_repel(size = 3) +
-  labs(
-    title = "Énergie renouvelable vs Émissions de Co2",
-    x = "Énergie renouvelable (% consommation totale)",
-    y = "Émissions CO₂(en Kgco2eq/hab)"
-  ) +
-  theme_minimal()
-
-
-# Croissance PIB vs Accessibilité à l'électricité 
-ggplot(df, aes(x = electricite, y = croissance_pib, label = pays)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  geom_text_repel(size = 3) +
-  labs(
-    title = "Accès à l'électricité vs Croissance du PIB",
-    x = "Accès à l'électricité (%)",
-    y = "Croissance PIB (%)"
   ) +
   theme_minimal()
 ```
@@ -1135,4 +1094,5 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
