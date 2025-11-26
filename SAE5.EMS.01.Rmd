@@ -366,14 +366,12 @@ hist(data_t$nb_cata_naturelles, main = "Répartition des nombres de catastrophes
 hist(data_t$taux_mort_inf, main = "Répartition des taux de mortalité infantile", xlab = "taux_mort_inf",ylab="Effectif")
 ```
 #interpretation de quelques histogrammes:
-Sur la repartition de la consommation d'energie renouvelable, une grande proportion des pays a une très faible part d'énergies renouvelables (0 à 40%) dans sa consommation totale. Cela suggère une dépendance marquée aux sources non renouvelables pour la majorité des pays.
-L'existence d'observations dans les classes à forte consommation de renouvelables (70-100%) indique qu'un sous-ensemble d'entités a réussi une transition énergétique ou dépend historiquement de sources renouvelables importantes (hydroélectricité, biomasse).
+- Sur la repartition de la consommation d'energie renouvelable, une grande proportion des pays a une très faible part d'énergies renouvelables (0 à 40%) dans sa consommation totale. Cela suggère une dépendance marquée aux sources non renouvelables pour la majorité des pays.
+Il y'a une minorite de pays qui ont une part de consommation d'energie renouvelable de 70 à 100% sur leur consommation totale d'energie, ce la nous indique u'un sous-ensemble des pays a réussi une transition énergétique ou dépend historiquement de sources renouvelables importantes.
 
-Sur la repartition de la hauteur moyenne des precipitations,La majorité des entités étudiées présente une hauteur moyenne de précipitations faible à modérée (moins de 1000 unités). La fréquence des observations diminue de manière monotone et significative à mesure que les précipitations augmentent, indiquant que les zones à très fortes précipitations (au-delà de 2000) sont rares dans l'échantillon.
+- Sur la repartition de la hauteur moyenne des precipitations,La majorité des pays présente une hauteur moyenne de précipitations faible à modérée (moins de 1000 mm). La fréquence des observations diminue de manière monotone et significative à mesure que les précipitations augmentent, indiquant que les zones à très fortes précipitations (au-delà de 2000) sont rares.
 
-Sur la répartition des surfaces forestières,La variable montre une hétérogénéité structurelle. L'échantillon comprend un grand groupe d'entités avec une très faible couverture forestière (potentiellement des zones arides ou très défrichées) et un groupe secondaire significatif avec une couverture modérée/saine. Les entités avec une très forte couverture (>80%) sont anecdotiques.
-
-sur la repartition des taux de mortalité infantile,Une forte majorité des entités ont une faible intégration des énergies renouvelables (moins de 40% de la consommation totale). Cependant, le plateau dans les classes supérieures indique qu'un sous-ensemble non négligeable d'entités a une dépendance élevée aux renouvelables, créant une distribution plus étalée à droite qu'un simple modèle exponentiel. La transition énergétique est donc inégale dans l'échantillon.
+- Sur la répartition des surfaces forestières, La variable montre une hétérogénéité structurelle. L'échantillon comprend un grand groupe de pays avec une très faible couverture forestière, moins de 20%, (potentiellement des zones arides ou très défrichées) et un groupe secondaire significatif (40%  peu pres) avec une couverture modérée/saine. Les entités avec une très forte couverture (>80%) sont anecdotiques.
 
 
 
@@ -1149,6 +1147,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
