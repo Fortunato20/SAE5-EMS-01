@@ -1007,83 +1007,101 @@ Extraction des données
 ```{r}
 # 1. Chargement des librairies (si ce n'est pas fait)
 library(ggplot2)
-library(tidyr) # Pour pivot_longer
+library(tidyr)
 
-CO2_CHN <- emissions_co2[emissions_co2$Country.Code=="CHN", 33:55]
-CO2_FRA <- emissions_co2[emissions_co2$Country.Code=="FRA", 33:55]
-CO2_NGA <- emissions_co2[emissions_co2$Country.Code=="NGA", 33:55]
-
+CO2_ARG <- emissions_co2[emissions_co2$Country.Code=="ARG", 33:55]
+CO2_QAT <- emissions_co2[emissions_co2$Country.Code=="QAT", 33:55]
+CO2_SOM <- emissions_co2[emissions_co2$Country.Code=="SOM", 33:55]
 
 serie_CO2_large <- data.frame(
     annee = 2000:2022,
-    CO2_CHN = as.vector(t(CO2_CHN)), 
-    CO2_FRA = as.vector(t(CO2_FRA)),
-    CO2_NGA = as.vector(t(CO2_NGA))
-  
+    CO2_ARG = as.vector(t(CO2_ARG)), 
+    CO2_QAT = as.vector(t(CO2_QAT)),
+    CO2_SOM = as.vector(t(CO2_SOM))
 )
 
-# 4. Conversion au format long (nécessaire pour ggplot)
 serie_CO2_long <- serie_CO2_large %>%
     pivot_longer(
         cols = starts_with("CO2_"), 
-        names_to = "Pays",        
-        values_to = "Emissions_CO2" 
+        names_to = "Pays",
+        values_to = "Emissions_CO2"
+    ) %>%
+    mutate(
+        Pays = case_when(
+            Pays == "CO2_ARG" ~ "Argentina",
+            Pays == "CO2_QAT" ~ "Qatar",
+            Pays == "CO2_SOM" ~ "Somalia",
+            TRUE ~ Pays
+        )
     )
+
 ggplot(data = serie_CO2_long, aes(x = annee, y = Emissions_CO2, color = Pays)) +
     geom_line(linewidth = 1) +
     labs(
-        title = "Évolution des émissions de CO2 par pays (2000-2022)",
+        title = "Évolution des émissions de CO₂ par pays (2000-2022)",
         x = "Année",
-        y = "Émissions de CO2", # Je suppose que c'est une valeur absolue et non une variation en %
+        y = "Émissions de CO2",
         color = "Pays"
     ) +
     theme_minimal()
 # Emissions de Co2 en KgCo2eq/hab
 ```
 
+L’évolution des émissions de CO₂ par habitant présente des tendances très différentes entre le Qatar, l’Argentine et la Somalie. Le Qatar (ligne verte) affiche de très loin les niveaux les plus élevés, dépassant régulièrement les 40 000 kgCO₂eq/habitant sur toute la période. Malgré quelques fluctuations marquées autour de 2009 et 2015, les émissions restent exceptionnellement fortes, ce qui reflète un modèle économique basé sur l’exploitation pétrolière et gazière, une forte consommation énergétique et une production industrielle intensive. L’Argentine (ligne rouge) présente des émissions beaucoup plus faibles, évoluant entre 4 000 et 5 000 kgCO₂eq/habitant. La tendance est globalement stable avec une légère hausse jusqu’en 2016, suivie de fluctuations modérées, témoignant d’un mix énergétique dominé par les hydrocarbures mais sans explosion de la consommation. Enfin, la Somalie (ligne bleue) reste à un niveau quasi nul tout au long de la période, avec des émissions très faibles (proches de 0), reflétant une industrialisation minimale, une faible consommation énergétique et des infrastructures limitées.
 
-#j'ai enlever le commentaire puisque je ne savais pas quel pays garder au final
+Résumé : Le Qatar présente des émissions extrêmement élevées et fluctuantes, l’Argentine maintient des niveaux moyens et relativement stables, tandis que la Somalie affiche des émissions quasi nulles en raison d’une très faible activité industrielle.
+
 
 # --- Analyse temporelle : Surface forestière ---
 ```{r}
 library(ggplot2)
 library(tidyr)
-library(dplyr) # Ajouté car pipe (%>%) est souvent inclus dans tidyverse
+library(dplyr)
 
-# 1. Extraction des données (USA et France)
-# Je suppose que les indices 45:67 correspondent aux années 2000 à 2022
-# 1. Extraction des données (Surface Forestière uniquement)
-FOR_USA <- surface_fores[surface_fores$Country.Code == "USA", 45:67]
-FOR_FRA <- surface_fores[surface_fores$Country.Code == "FRA", 45:67]
-FOR_NGA <- surface_fores[surface_fores$Country.Code == "NGA", 45:67] # Ajout de l'Allemagne
+# 1. Extraction des données surface forestière pour les 3 pays
+FOR_SUR <- surface_fores[surface_fores$Country.Code == "SUR", 45:67]
+FOR_CUB <- surface_fores[surface_fores$Country.Code == "CUB", 45:67]
+FOR_QAT <- surface_fores[surface_fores$Country.Code == "QAT", 45:67]
 
-# 2. Création du data.frame "large"
+# 2. Création du dataframe "large"
 serie_FOR_large <- data.frame(
     annee = 2000:2022,
-    FOR_USA = as.vector(t(FOR_USA)), 
-    FOR_FRA = as.vector(t(FOR_FRA)),
-    FOR_NGA = as.vector(t(FOR_NGA)) # La colonne est maintenant en FOR_
+    FOR_SUR = as.vector(t(FOR_SUR)), 
+    FOR_CUB = as.vector(t(FOR_CUB)),
+    FOR_QAT = as.vector(t(FOR_QAT))
 )
 
-# 3. Conversion au format long (Le filtre "FOR_" fonctionne maintenant pour les 3 pays)
+# 3. Conversion en format long + renommer les pays
 serie_FOR_long <- serie_FOR_large %>%
     pivot_longer(
-        cols = starts_with("FOR_"), 
-        names_to = "Pays",        
-        values_to = "Surface_Forestiere" 
+        cols = starts_with("FOR_"),
+        names_to = "Pays",
+        values_to = "Surface_Forestiere"
+    ) %>%
+    mutate(
+        Pays = case_when(
+            Pays == "FOR_SUR" ~ "Suriname",
+            Pays == "FOR_CUB" ~ "Cuba",
+            Pays == "FOR_QAT" ~ "Qatar",
+            TRUE ~ Pays
+        )
     )
 
-# 4. Visualisation (le graphique affichera 3 lignes)
+# 4. Visualisation du graphique
 ggplot(data = serie_FOR_long, aes(x = annee, y = Surface_Forestiere, color = Pays)) +
-    geom_line(linewidth = 1) +
+    geom_line(linewidth = 1.2) +
     labs(
-        title = "Évolution des surfaces forestières par pays (2000-2022)",
+        title = "Évolution des surfaces forestières - Suriname, Cuba, Qatar (2000-2022)",
         x = "Année",
         y = "Surface forestière (% du territoire)",
         color = "Pays"
     ) +
     theme_minimal()
+
 ```
+L’évolution des surfaces forestières montre des dynamiques très contrastées entre le Suriname, Cuba et le Qatar. Pour Cuba (ligne rouge), la surface forestière augmente progressivement, passant d’environ 23 % en 2000 à près de 31 % en 2022. Cette hausse régulière reflète les efforts de reboisement et les politiques de restauration écologique menées depuis plusieurs années. Le Suriname (ligne bleue) présente, quant à lui, l’une des couvertures forestières les plus élevées au monde, autour de 96–98 % sur toute la période. Malgré quelques légères variations après 2013, la tendance reste globalement stable, témoignant d’une faible artificialisation du territoire et d’écosystèmes encore largement préservés. Enfin, le Qatar (ligne verte) affiche une surface forestière quasi nulle (≈ 0 %) sur l’ensemble de la période, ce qui correspond à ses conditions désertiques et à l’absence de forêts naturelles.
+
+Résumé : Cuba montre une progression nette de ses surfaces forestières, le Suriname maintient une couverture exceptionnellement élevée et stable, tandis que le Qatar reste dépourvu de forêt en raison de son climat aride
 
 
 # Faire de la prévision (modélisation) avec la fonction predict
@@ -1138,6 +1156,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
