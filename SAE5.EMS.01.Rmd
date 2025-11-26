@@ -534,8 +534,9 @@ m_sans_na
 # couleur des pays en fonction de la classe, pour pouvoir zoomer pour voir la classe
 # renderleaflet a la place de renderplot dans shiny pour mettre la carte 
 ```
+Cette carte montre la disparité géographique dans l'accès à l'électricité, les points représente les pays ayant des données disponibles. Les pays d'Amérique du Nord, d'Europe, d'Asie de l'Est et d'Océanie (couleur bleu foncé à marine) affichent un taux d'accès élevé (90-100%). En revanche, l'Afrique subsaharienne (couleurs bleu clair à moyen), présente la concentration la moins élevée de pays avec un faible taux d'accès (souvent inférieur à 40-50%).
 
-# Carte leaflet pour representer la hauteur moyenne des précipitations des pays
+C'est la carte leaflet pour presenté tout les pays ou on a la valeur de la hauteur moyenne des précipitations
 ```{r}
 library(leaflet) 
 library(dplyr) # Nécessaire pour la fonction filter()
@@ -599,6 +600,79 @@ m_pluie <- leaflet(data = monde_data_filtre) %>% # Utilise le jeu de données fi
 m_pluie
 # la ligne equatoriale est plus arosée (tropic nord plus de precipitations que le sud)
 ```
+On remarque que Les plus fortes précipitations (bleu foncé, > 2,500 mm) sont concentrées en Amérique du Sud (particulièrement l'Amazonie), en Afrique Centrale et en Asie du Sud-Est (mousson). Inversement, les plus faibles précipitations (jaune pâle, < 1,000 mm) dominent l'Afrique du Nord, le Moyen-Orient, et de vastes étendues d'Asie Centrale, correspondant aux grandes zones désertiques et aux zones tempérées continentales.
+
+
+C'est la carte leaflet pour presenté tout les pays ou on a eu une catastrophe naturelle.
+```{r}
+library(leaflet) 
+library(dplyr) # Nécessaire pour la fonction filter()
+
+# --- NOUVEL INDICATEUR : Nombre de Catastrophes Naturelles ---
+indicateur_a_afficher <- "nb_cata_naturelles"
+unite <- "" # Pas d'unité spécifique pour un nombre brut
+
+# NOTE IMPORTANTE : Assurez-vous que votre jeu de données `monde_data` (ou `data_t` si elle contient les coordonnées géographiques)
+# existe et contient les colonnes `nb_cata_naturelles`, `LON`, `LAT` et `NAME`.
+# J'utilise `monde_data` pour la cohérence avec les exemples précédents.
+
+# --- FILTRAGE : Supprimer les pays où 'nb_cata_naturelles' est NA ---
+monde_data_filtre <- monde_data %>%
+  filter(!is.na(nb_cata_naturelles))
+
+# --- Création de la palette de couleurs (du rouge clair au rouge foncé) ---
+# La palette "Reds" de RColorBrewer correspond à votre demande.
+palette_cata <- colorNumeric(
+  palette = "Reds", # Rouge clair pour faible (début de la palette), Rouge foncé pour élevé (fin de la palette)
+  # Domaine basé sur les données NON-NA de 'nb_cata_naturelles'
+  domain = monde_data_filtre$nb_cata_naturelles
+)
+
+# --- Création de la Carte Leaflet ---
+m_cata <- leaflet(data = monde_data_filtre) %>% # Utilise le jeu de données filtré
+  
+  # 1. Ajouter le fond de carte
+  addProviderTiles("CartoDB.Positron") %>% 
+  
+  # 2. Ajouter les marqueurs circulaires avec COULEUR DYNAMIQUE
+  addCircleMarkers(
+    ~LON, ~LAT, 
+    radius = 5,
+    # Utilisation de la nouvelle palette 'cata'
+    color = ~palette_cata(nb_cata_naturelles), 
+    fillOpacity = 0.8,
+    stroke = FALSE, 
+    
+    # 3. Définir le contenu du pop-up
+    popup = ~paste0(
+      "<b>Pays:</b> ", NAME, "<br>",
+      "<b>Nombre de catastrophes:</b> ", nb_cata_naturelles, unite
+    ),
+    
+    # 4. Définir le contenu du label
+    label = ~NAME,
+    labelOptions = labelOptions(
+      style = list("font-weight" = "bold", "padding" = "3px 8px"),
+      textsize = "15px",
+      direction = "auto"
+    )
+  ) %>%
+  
+  # 5. AJOUT DE LA LÉGENDE
+  addLegend(
+    pal = palette_cata,
+    values = ~nb_cata_naturelles, # Les valeurs pour lesquelles la légende est générée
+    title = "Nb. de catastrophes naturelles",
+    position = "bottomright",
+    opacity = 1
+  )
+
+# Afficher la carte
+m_cata
+
+```
+
+La carte montre une concentration des pays les plus touchés (points rouge foncé, $\ge 15$ catastrophes) dans les régions à forte activité, notamment l'Asie du Sud et du Sud-Est (particulièrement autour de la Chine, de l'Inde et de l'Indonésie) ainsi qu'en Amérique Centrale (autour du Mexique et des Caraïbes). L'Amérique du Nord, l'Europe et l'Amérique du Sud présentent des nombres de catastrophes généralement faibles à modérés (points rouge clair à moyen). La faible intensité des couleurs sur la majeure partie de l'Afrique et de l'Europe de l'Est indique un nombre de catastrophes enregistrées significativement inférieur à ces zones de forte concentration
 
 
 # Diagramme de corrélation 
@@ -1074,6 +1148,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
