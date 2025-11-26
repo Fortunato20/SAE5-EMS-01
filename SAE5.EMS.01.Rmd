@@ -366,7 +366,8 @@ hist(data_t$nb_cata_naturelles, main = "Répartition des nombres de catastrophes
 hist(data_t$taux_mort_inf, main = "Répartition des taux de mortalité infantile", xlab = "taux_mort_inf",ylab="Effectif")
 ```
 #interpretation de quelques histogrammes:
-Sur la repartition de la consommation d'energie renouvelable ,une grande proportion des entités a une très faible part d'énergies renouvelables (0 à 40%) dans sa consommation totale. Cela suggère une dépendance marquée aux sources non renouvelables pour une grande partie de l'échantillon. L'existence d'observations dans les classes à forte consommation de renouvelables (70-100%) indique qu'un sous-ensemble d'entités a réussi une transition énergétique ou dépend historiquement de sources renouvelables importantes (hydroélectricité, biomasse).
+Sur la repartition de la consommation d'energie renouvelable, une grande proportion des pays a une très faible part d'énergies renouvelables (0 à 40%) dans sa consommation totale. Cela suggère une dépendance marquée aux sources non renouvelables pour la majorité des pays.
+L'existence d'observations dans les classes à forte consommation de renouvelables (70-100%) indique qu'un sous-ensemble d'entités a réussi une transition énergétique ou dépend historiquement de sources renouvelables importantes (hydroélectricité, biomasse).
 
 Sur la repartition de la hauteur moyenne des precipitations,La majorité des entités étudiées présente une hauteur moyenne de précipitations faible à modérée (moins de 1000 unités). La fréquence des observations diminue de manière monotone et significative à mesure que les précipitations augmentent, indiquant que les zones à très fortes précipitations (au-delà de 2000) sont rares dans l'échantillon.
 
@@ -1148,6 +1149,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
