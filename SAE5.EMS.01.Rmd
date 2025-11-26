@@ -347,7 +347,7 @@ hist(data_t$electricite, main = "Répartition de l'accès à l'électricité", x
 
 hist(data_t$agriculture, main = "Répartition de la valeur ajoutée de l'agriculture (% du PIB)", xlab = "Valeur ajoutée de l'agriculture (% du PIB)",ylab="Effectif")
 
-hist(data_t$precipitations, main = "Répartition des précipitations", xlab = "Hauteur moyenne des précipitations",ylab="Effectif")
+hist(data_t$precipitations, main = "Répartition des  hauteur moyen des précipitations", xlab = "Hauteur moyenne des précipitations",ylab="Effectif")
 
 hist(data_t$croissance_pib, main = "Répartition de la croissance du PIB par habitant (% annuel)", xlab = "Croissance du PIB par habitant (% annuel)",ylab="Effectif")
 
@@ -363,19 +363,17 @@ hist(data_t$surface_fores, main = "Répartition des surfaces foréstieres", xlab
 
 hist(data_t$nb_cata_naturelles, main = "Répartition des nombres de catastrophes naturelles", xlab = "Nombre de catastrophes naturelles",ylab="Effectif")
 
-hist(data_t$precipitations, main = "Répartition de la hauteurs moyenne des precipitations", xlab = "precipitation moyennes",ylab="Effectif")
+hist(data_t$taux_mort_inf, main = "Répartition des taux de mortalité infantile", xlab = "taux_mort_inf",ylab="Effectif")
 ```
-Les histogrammes nous montrent comment les 176 pays se répartissent sur chaque indicateur, ce qui donne du sens aux extrêmes de l'ACP.
+#interpretation de quelques histogrammes:
+Sur la repartition de la consommation d'energie renouvelable ,une grande proportion des entités a une très faible part d'énergies renouvelables (0 à 40%) dans sa consommation totale. Cela suggère une dépendance marquée aux sources non renouvelables pour une grande partie de l'échantillon. L'existence d'observations dans les classes à forte consommation de renouvelables (70-100%) indique qu'un sous-ensemble d'entités a réussi une transition énergétique ou dépend historiquement de sources renouvelables importantes (hydroélectricité, biomasse).
 
-taux_mort_inf / esperance_vie : C'est une distribution très inégale (en J inversé). La majorité des pays (plus de 150) ont un taux de mortalité infantile très faible (proche de 0) et une espérance de vie élevée (autour de 70-80 ans). Seule une petite queue de pays (ceux à l'extrême droite de Dim 1 sur l'ACP) tire les moyennes vers le bas. C'est un marqueur fort de la séparation binaire entre pays développés et en grande difficulté.
+Sur la repartition de la hauteur moyenne des precipitations,La majorité des entités étudiées présente une hauteur moyenne de précipitations faible à modérée (moins de 1000 unités). La fréquence des observations diminue de manière monotone et significative à mesure que les précipitations augmentent, indiquant que les zones à très fortes précipitations (au-delà de 2000) sont rares dans l'échantillon.
 
-agriculture / croissance_pop : Ces variables suivent une distribution "normale" ou légèrement asymétrique, centrée sur des valeurs faibles (moins de 10% pour l'agriculture, croissance autour de 0-2%). Leurs valeurs extrêmes (fortement positives, à droite sur l'ACP) sont donc le fait d'une minorité de pays.
+Sur la répartition des surfaces forestières,La variable montre une hétérogénéité structurelle. L'échantillon comprend un grand groupe d'entités avec une très faible couverture forestière (potentiellement des zones arides ou très défrichées) et un groupe secondaire significatif avec une couverture modérée/saine. Les entités avec une très forte couverture (>80%) sont anecdotiques.
 
-croissance_pib : La grande majorité est centrée sur 0-5%. Les rares pics extrêmes (positifs ou négatifs) montrent que la performance économique est très volatile ou qu'elle est due à des événements exceptionnels (ceux que l'Axe 3 isole).
+sur la repartition des taux de mortalité infantile,Une forte majorité des entités ont une faible intégration des énergies renouvelables (moins de 40% de la consommation totale). Cependant, le plateau dans les classes supérieures indique qu'un sous-ensemble non négligeable d'entités a une dépendance élevée aux renouvelables, créant une distribution plus étalée à droite qu'un simple modèle exponentiel. La transition énergétique est donc inégale dans l'échantillon.
 
-energie_renouv / surface_fores : Ces distributions sont relativement plates, montrant que les pays se répartissent sur tout le spectre (il y a des pays très boisés et peu boisés, et des pays avec peu et beaucoup d'énergies renouvelables).
-
-nb_cata_naturelles / emissions_co2 : Ces distributions sont fortement asymétriques (la majorité des pays n'ont presque pas de catastrophes ou d'émissions faibles). Les outliers (pays développés, grands, ou fortement pollueurs) sont ceux qui créent les petites barres à droite.
 
 
 # Boite à moustache de tous les indicateurs (les points representent les pays)
@@ -1094,5 +1092,6 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
