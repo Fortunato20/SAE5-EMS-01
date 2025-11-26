@@ -866,6 +866,8 @@ L’analyse en composantes principales met en évidence plusieurs profils de pay
 Il y a trop d'individus concentrés au centre, rendant l'identification des pays difficile. De plus, les axes 3 et 4 expliquent moins de variance, il est préférable de se concentrer sur les axes 1 et 2.
 
 # On refait l'ACP avec ggplot pour les coordonnées (le nuage des points des individus) car on peut deplacer les labels pour qu'ils soient plus visibles
+
+# Nuage de points des individus (ACP) - Axe 1 et 2
 ```{r}
 library(ggplot2)
 library(ggrepel)
@@ -887,51 +889,31 @@ ggplot(ind_coords, aes(x = Dim1, y = Dim2, label = Pays)) +
   ) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
-1. Le Bloc de l'Excellence (Gauche, Dim 1 < 0)
-C'est le cluster du Développement Élevé (fortes electricite et esperance_vie).
-
-Les Modèles (Haut-Gauche) : Pays comme JPN, KOR, ISL, et la plupart des pays d'Europe de l'Ouest (FRA, NLD, BEL). Ils affichent les meilleurs indicateurs de bien-être et sont relativement équilibrés sur l'axe de l'impact environnemental.
-
-Les Riches Pollueurs (Bas-Gauche) : C'est le cluster des pays développés mais pénalisés par l'Axe 2 (Pôle Pollueur). QAT (Qatar) est l'outlier absolu du graphique, tiré vers le bas de manière spectaculaire par l'impact de ses emissions_co2 et/ou une croissance démographique extrême. KWT et ARE le suivent de près. Leurs indices de développement ne cachent pas leur énorme empreinte.
-
-2. Le Bloc des Défis Structurels (Droite, Dim 1 > 0)
-C'est le cluster de l'Agriculture et des Défis Démographiques et Ruraux (taux de mortalité infantile élevé).
-
-Les Outliers de la Pauvreté (Extrême Droite) : CAF (Centrafrique) est le pays le plus isolé et le plus à droite, symbolisant le niveau le plus bas sur l'axe du Développement. SOM (Somalie) et NER (Niger) sont aussi très à droite et tirés vers le bas par une forte pression démographique. C'est la zone où les indicateurs d'infrastructures et de bien-être sont les plus faibles.
-
-Le Groupe en Difficulté : Une majorité de pays d'Afrique sub-saharienne (MLI, ETH, TCD, BDI, UGA) et d'Haïti (HTI) se concentrent dans cette zone.
-
-3. Le Centre et la Transition (Autour de l'Origine)
-C'est la vaste majorité. Ces pays ont des profils d'indicateurs mélangés, souvent avec une croissance_pib modérée mais des défis dans d'autres domaines.
-
-On y trouve la majorité de l'Amérique du Sud (BRA, ARG, COL) et une grande partie de l'Asie (hors Extrême-Orient).
-
-Le graphique montre que le facteur Développement (Axe 1) est la principale source de disparité, suivi de la Pression Environnementale (Axe 2) qui crée une scission même au sein des pays riches.
-
-#Avec geom_text_repel(), les labels ne se chevauchent presque jamais et tu peux identifier facilement les pays concentrés au centre.
+#Avec geom_text_repel(), les labels ne se chevauchent presque jamais et on peut identifier facilement les pays concentrés au centre.
 
 
-## On peut faire un nuage entre l'axe 1 (capacité de faire  aux catastrophes naturelles) et le 4 ( l'exposition aux catastrophes). 
+# Nuage de points des individus (ACP) - Axe 3 et 4
 ```{r}
-# Coordonnées des individus sur les axes 1 et 4
-ind_coords_1_4 <- data.frame(
+library(ggplot2)
+library(ggrepel)
+
+# Coordonnées des individus sur les axes 3 et 4
+ind_coords <- data.frame(
   Pays = rownames(acp$ind$coord),
-  Dim1 = acp$ind$coord[,1],
+  Dim3 = acp$ind$coord[,3],
   Dim4 = acp$ind$coord[,4]
 )
-ggplot(ind_coords_1_4, aes(x = Dim1, y = Dim4, label = Pays)) +
-  geom_point(color = "darkgreen", alpha = 0.6) +  # points semi-transparents
+ggplot(ind_coords, aes(x = Dim3, y = Dim4, label = Pays)) +
+  geom_point(color = "blue", alpha = 0.6) +      # points semi-transparents
   geom_text_repel(size = 3, max.overlaps = 30) + # labels ajustés automatiquement
   theme_minimal() +
   labs(
-    title = "Nuage des individus (Axes 1 et 4)",
-    x = "Dim 1",
+    title = "Nuage des individus (Axes 3 et 4)",
+    x = "Dim 3",
     y = "Dim 4"
   ) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
 
 
 # Classification hiérarichique
@@ -1155,6 +1137,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
