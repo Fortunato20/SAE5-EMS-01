@@ -857,7 +857,7 @@ Dominance de la Dim 1 : La première dimension est de loin la plus importante, c
 - Axe 4 : Cet axe regroupe les pays avec un grand nombre de catastrophes naturelles et une grande croissance de la polulation 
 
 Synthèse : 
-L’analyse en composantes principales met en évidence plusieurs profils de pays. Le premier axe distingue des pays développés, fortement électrifiés, à forte espérance de vie et émetteurs de CO₂, de pays plus vulnérables, marqués par une mortalité infantile élevée, une forte croissance démographique et une économie largement agricole. Le second axe oppose des pays très forestiers, arrosés et en croissance économique, à d’autres plus secs, moins boisés et davantage marqués par les émissions de CO₂ et la pression démographique. Les axes 3 et 4 apportent des nuances supplémentaires : l’axe 3 isole essentiellement les pays dont la dynamique est tirée par une croissance du PIB, tandis que l’axe 4 met en évidence les pays confrontés à de nombreuses catastrophes naturelles et à une forte croissance de la population.
+L’analyse en composantes principales met en évidence plusieurs profils de pays. Le premier axe distingue des pays développés, fortement électrifiés, à forte espérance de vie et émetteurs de Co2, de pays plus vulnérables, marqués par une mortalité infantile élevée, une forte croissance démographique et une économie largement agricole. Le second axe oppose des pays très forestiers, fortement arrosés et en croissance économique, à d’autres plus secs, moins boisés et davantage marqués par les émissions de CO2 et la pression démographique. Les axes 3 et 4 apportent des nuances supplémentaires : l’axe 3 isole essentiellement les pays dont la dynamique est tirée par une croissance du PIB, tandis que l’axe 4 met en évidence les pays confrontés à de nombreuses catastrophes naturelles et à une forte croissance de la population.
 
 
 
@@ -1154,6 +1154,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
