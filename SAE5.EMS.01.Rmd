@@ -773,41 +773,15 @@ Inertie Expliquée : Ces 4 dimensions expliquent ensemble près de 74% de la var
 
 Dominance de la Dim 1 : La première dimension est de loin la plus importante, capturant à elle seule 37.68% de la variance.
 
-#--------- Interprétation du Plan 1/2 (Dim 1 vs Dim 2) ---------#
-
 # Cercle des Corrélations (Variables)
-1.Plan Principal : Dim 1 (37.68%) vs Dim 2 (17.70%)
-Ce plan capture l'opposition fondamentale de nos données :
 
-Axe 1 (Développement Humain et Infrastructures) :
+- Axe 1 oppose les pays à fort accès à l'électricité, forte espérance de vie et plus d’émissions de CO₂, aux pays caractérisés par une forte mortalité infantile, une forte croissance démographique, une agriculture dominante et un recours plus fort aux énergies renouvelables.
 
-Pôle Gauche (Développement Élevé) : Caractérisé par les vecteurs electricite et esperance_vie. Ces variables pointent clairement vers la gauche, définissant le pôle des pays avec des infrastructures de qualité et un fort bien-être. Les variables emissions_co2 et nb_cata_naturelles sont également orientées vers la gauche, indiquant que les pays développés sont, en général, les plus impactés par ces facteurs.
+- Axe 2 oppose les pays très forestiers, fortement arrosés et à croissance économique positive, aux pays plus secs, moins boisés et où les émissions de CO₂ et la croissance de population pèsent davantage.
 
-Pôle Droit (Défis Démographiques et Ruraux) : Fortement défini par agriculture et taux_mort_inf. Ces variables sont opposées à l'axe du développement, caractérisant les pays où l'économie est agricole et les défis de santé publique sont majeurs. croissance_pop est également de ce côté, tirant vers le bas.
+- Axe 3 : cet axe isole les pays dont la performance est presque uniquement dictée par une dynamique économique forte (forte croissance du PIB)
 
-Axe 2 (Environnemental / Croissance) :
-
-Pôle Haut (Forte Dynamique Économique / Précipitations) : Dominé par precipitations et surface_fores. Ce pôle est lié aux ressources naturelles et à la croissance_pib, qui est orientée vers le haut.
-
-Pôle Bas (Pays Pollueurs) : Fortement défini par emissions_co2 et croissance_pop, qui pointent vers le bas. Cela sépare les pays avec une forte pression démographique et/ou une forte empreinte carbone des autres.
-
-2.Plan Secondaire : Dim 3 (9.69%) vs Dim 4 (9.05%)
-Ce plan isole des facteurs de singularité et de risque :
-
-Axe 3 (Croissance Spécifique) :
-
-Pôle Droit : Fortement dominé par la croissance_pib. Cet axe isole les pays dont la performance est presque uniquement dictée par une dynamique économique forte.
-
-Pôle Gauche : Oppose la croissance à la vulnérabilité (caractérisé par nb_cata_naturelles et emissions_co2).
-
-Axe 4 (Risque / Vulnérabilité) :
-
-Pôle Haut : Fortement défini par nb_cata_naturelles et croissance_pop. C'est un axe de la vulnérabilité combinant les risques naturels et la pression démographique.
-
-Pôle Bas : La variable electricite est orientée vers le bas, s'opposant faiblement au facteur de risque.
-
-Les deux premiers axes capturent le contraste principal : Développement vs Défis Ruraux/Démographiques. Les axes 3 et 4 affinent l'analyse en identifiant les facteurs de croissance exceptionnelle et de vulnérabilité environnementale.
-#Amelioration du nuage des individus
+- Axe 4 : Cet axe regroupe les pays avec un grand nombre de catastrophes naturelles et une grande croissance de la polulation #Amelioration du nuage des individus
 Il y a trop d'individus concentrés au centre, rendant l'identification des pays difficile. De plus, les axes 3 et 4 expliquent moins de variance, il est préférable de se concentrer sur les axes 1 et 2.
 
 # On refait l'ACP avec ggplot pour les coordonnées (le nuage des points des individus) car on peut deplacer les labels pour qu'ils soient plus visibles
@@ -1100,6 +1074,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
