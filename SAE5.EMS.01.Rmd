@@ -777,7 +777,7 @@ ggplot(df_plot, aes_string(x = x_var, y = y_var, label = "pays")) +
     y = "Croissance de la Population"
   )
 ```
-
+Le graphique montre que plus l’espérance de vie est faible, plus la croissance de la population est élevée. Les pays comme le Niger, le Tchad ou le Mali ont une espérance de vie autour de 50–60 ans mais une croissance très forte. À l’inverse, les pays avec une espérance de vie élevée comme le Japon, l’Italie ou la Grèce ont une croissance faible ou négative. On voit aussi des cas particuliers comme l’Ukraine avec une croissance très négative ou la République centrafricaine avec une espérance de vie très basse mais une croissance presque nulle. Globalement, il existe une relation inverse : les pays moins développés ont une forte croissance démographique, alors que les pays plus développés ont une faible croissance.
 
 ```{r}
 df <- data_t   # Jeu de données propre
@@ -794,7 +794,7 @@ ggplot(df, aes(x = electricite, y = esperance_vie, label = pays)) +
   ) +
   theme_minimal()
 ```
-
+Le graphique montre clairement que plus un pays a accès à l’électricité, plus l’espérance de vie est élevée. Les pays qui ont un accès très faible (autour de 10–30 %) comme le Tchad, Burundi, Niger ou la République centrafricaine ont aussi une espérance de vie basse. À partir de 70–100 % d’accès à l’électricité, on voit que l’espérance de vie monte fortement et se stabilise autour de 70–80 ans. La tendance est positive et logique : sans électricité, les services de base comme les hôpitaux, l’eau potable, la conservation des aliments ou l’éducation fonctionnent mal, donc les gens vivent moins longtemps. Ici, la relation est simple : plus d’électricité = meilleure qualité de vie = plus longue espérance de vie.
 
 
 # ACP
@@ -1147,6 +1147,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
