@@ -437,6 +437,14 @@ for (var in indicateurs) {
        pos = 4, cex = 0.75)
 }
 ```
+Distribution de croissance_pib (Croissance du PIB): La distribution est étalée vers le haut. La valeur maximale (Max : Guyana) est une valeur aberrante très éloigné du reste des données, indiquant une croissance du PIB exceptionnelle. Le minimum (Min : Ukraine) est également une valeur aberrante significative dans l'autre direction. La majorité des pays ont une croissance du PIB proche de la moyenne globale, mais il existe des cas extrêmes et notables de très forte croissance (Guyana) et de forte contraction (Ukraine). 
+
+Distribution de agriculture: Les valeurs maximales (Max : République fédérale de Somalie) sont des outliers élevés, montrant une dépendance agricole beaucoup plus forte que la norme. Le minimum (Min : Singapour) est également un outlier bas, typique d'une économie très peu dépendante de l'agriculture. La majeure partie des pays ont une part de l'agriculture dans le PIB relativement standardisée, mais un petit nombre de pays, notamment la Somalie, se démarquent par une dépendance agricole très élevée.
+
+Distribution de esperance_vie: La valeur minimale (Min : République centrafricaine) est un outlier extrême, soulignant une espérance de vie nettement inférieure à la norme mondiale. Le maximum (Max : Japon) est élevé, mais beaucoup moins extrême, indiquant que la plupart des pays ont une espérance de vie pas trop éloignée de celle du Japon. La distribution est serrée avec une minorité de pays, notamment la République centrafricaine, qui affichent une espérance de vie très faible par rapport à la moyenne mondiale.
+
+Distribution de croissance_pop: La majorité des pays ont un taux de croissance démographique relativement standardisé et modéré. L'Ukraine se distingue par une décroissance démographique très forte, tandis que le Qatar présente une croissance très élevée probablement due à l'immigration.
+
 
 # Importation de la carte monde
 
@@ -1092,6 +1100,7 @@ Choix : avec le logarithme.
 ```{r}
 
 ```
+
 
 
 
