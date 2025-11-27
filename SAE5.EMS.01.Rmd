@@ -1149,13 +1149,31 @@ Solution : soit on ajuste le logarithme de y à x, soit on décale les années.
 Choix : avec le logarithme.
 
 
+Mettre les vraie valeurs pour les boites à moustaches (ne pas standardiser, on a toujous la meme forme), 
+essayer une droite quadratique pour les nuages de points entre 2 indicateurs.
+Verififer la republique centre africaine qui a une esperance de vie tres faible 
 
+Rajouter les axes pour les nuages des individus (acp), xintecept peut etre
 
+Table des signes pour les classes (comme vu en 2e annéé) ou alors avec des couleurs 
+
+essayer avec l'echelle l'ogarithmique en ordonnée pour les séries temporelles 
+
+#--------------------Rshiny-----------------------
+On peut transformer les analyses en module et apres les integrer dans le Shiny, ca nous permet d'avoir un SHiny plus court
+ paackage DT (renderDT pour le tableau des statistiques en SHiny)
+
+Pour les ACP, il faut pouvoir choisir le choix des axes pour le cercle de corrélations et le nuage de points egalement
+
+Pou le CAH (shiny) il faut que les couleurs du dendogramme soient les emmes que ceux de la cartes (pour les classes)
+
+Afficher l'image pour ggpairs parce que ca prend du temps à charger. Rajouter une droite de regression dans le ggpairs
 
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 
 ```
+
 
 
 
