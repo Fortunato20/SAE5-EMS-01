@@ -1150,15 +1150,17 @@ Choix : avec le logarithme.
 
 
 ##|-------------------------Remarques à changer-------------------------------
-Mettre les vraie valeurs pour les boites à moustaches (ne pas standardiser, on a toujous la meme forme), 
-essayer une droite quadratique pour les nuages de points entre 2 indicateurs.
-Verififer la republique centre africaine qui a une esperance de vie tres faible 
+- Mettre les vraies valeurs pour les boites à moustaches (ne pas standardiser, on a toujous la meme forme), 
 
-Rajouter les axes pour les nuages des individus (acp), xintecept peut etre
+- Rajouter les axes pour les nuages des individus (acp), xintecept peut etre
 
-Table des signes pour les classes (comme vu en 2e annéé) ou alors avec des couleurs 
+- Essayer une droite quadratique pour les nuages de points entre 2 indicateurs.
 
-essayer avec l'echelle l'ogarithmique en ordonnée pour les séries temporelles
+- Verififer la republique centre africaine qui a une esperance de vie tres faible (dans le 2e nuage de points sur analyse croisée)
+
+- Table des signes pour les classes (comme vu en 2e annéé) ou alors avec des couleurs 
+
+- Essayer avec l'echelle l'ogarithmique en ordonnée pour les séries temporelles
 
 #--------------------Rshiny-----------------------
 On peut transformer les analyses en module et apres les integrer dans le Shiny, ca nous permet d'avoir un SHiny plus court
@@ -1185,6 +1187,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ```{r}
 
 ```
+
 
 
 
