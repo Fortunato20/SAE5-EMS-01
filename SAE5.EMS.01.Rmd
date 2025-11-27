@@ -1172,6 +1172,8 @@ Pour les ACP, il faut pouvoir choisir le choix des axes pour le cercle de corré
 
 Pou le CAH (shiny) il faut que les couleurs du dendogramme soient les emmes que ceux de la cartes (pour les classes)
 
+Moyennes par classe ne s'affiche pas dans CAH
+
 Afficher l'image pour ggpairs parce que ca prend du temps à charger. Rajouter une droite de regression dans le ggpairs
 
 Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs
@@ -1188,6 +1190,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
