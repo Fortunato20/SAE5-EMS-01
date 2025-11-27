@@ -1170,7 +1170,7 @@ Pou le CAH (shiny) il faut que les couleurs du dendogramme soient les emmes que 
 
 Afficher l'image pour ggpairs parce que ca prend du temps à charger. Rajouter une droite de regression dans le ggpairs
 
-
+Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs
 
 ##----------Conclusion -----------------------
 Comparer la vulnerabilité et l'exposistion - Conclusion
@@ -1182,6 +1182,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ```{r}
 
 ```
+
 
 
 
