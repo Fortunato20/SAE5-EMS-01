@@ -890,7 +890,9 @@ ggplot(ind_coords, aes(x = Dim1, y = Dim2, label = Pays)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 #Avec geom_text_repel(), les labels ne se chevauchent presque jamais et on peut identifier facilement les pays concentrés au centre.
-
+Sur l’Axe 1, on voit deux groupes opposés : d’un côté, les pays avec bonne espérance de vie, beaucoup d’électricité, plus de CO₂, donc généralement plus développés ;de l’autre, les pays avec forte mortalité infantile, forte croissance démographique, agriculture dominante et plus de renouvelables.Les pays très à droite comme (la Centrafrique, Somalie, Niger,ect... )sont clairement ceux avec les plus grosses difficultés.                                                     
+Sur l’Axe 2, les pays du haut sont ceux plus forestiers, plus arrosés et avec une meilleure croissance économique, alors que ceux du bas sont plus secs, moins boisés et marqués par une croissance de population ou des émissions plus lourdes.
+La majorité des pays est concentrée au centre, ce qui veut dire qu’ils ont des profils mixtes, sans caractéristiques très extrêmes.Les pays très éloignés du centre (comme CAF, QAT, SAU, KWT, TCD, SOM, NER) sont ceux qui ont des profils atypiques ou extrêmes par rapport aux autres.
 
 # Nuage de points des individus (ACP) - Axe 3 et 4
 ```{r}
@@ -914,8 +916,9 @@ ggplot(ind_coords, aes(x = Dim3, y = Dim4, label = Pays)) +
   ) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Sur l’Axe 3, les pays à droite ont une forte croissance du PIB, comme la Guyane, tandis que les pays à gauche ont une croissance faible ou négative, comme l’Ukraine. Cet axe distingue donc surtout les dynamiques économiques.
 
-
+Sur l’Axe 4, les pays en haut ont beaucoup de catastrophes naturelles et une forte croissance de la population, comme les États-Unis ou certains pays du Golfe, alors que les pays en bas ont des risques plus faibles. Les pays du Golfe se placent souvent en haut-à-droite, tandis que des pays comme l’Ukraine ou certains pays d’Afrique/Asie centrale sont plutôt en bas-à-gauche.
 # Classification hiérarichique
 C'est une Classification Ascendante Hiérarchique (CAH) sur les 4 premieres composantes principales des données de l'ACP pour regrouper les pays.
 ```{r}
@@ -1195,6 +1198,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
