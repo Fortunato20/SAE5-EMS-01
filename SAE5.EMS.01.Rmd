@@ -1149,6 +1149,7 @@ Solution : soit on ajuste le logarithme de y à x, soit on décale les années.
 Choix : avec le logarithme.
 
 
+##|-------------------------Remarques à changer-------------------------------
 Mettre les vraie valeurs pour les boites à moustaches (ne pas standardiser, on a toujous la meme forme), 
 essayer une droite quadratique pour les nuages de points entre 2 indicateurs.
 Verififer la republique centre africaine qui a une esperance de vie tres faible 
@@ -1157,7 +1158,7 @@ Rajouter les axes pour les nuages des individus (acp), xintecept peut etre
 
 Table des signes pour les classes (comme vu en 2e annéé) ou alors avec des couleurs 
 
-essayer avec l'echelle l'ogarithmique en ordonnée pour les séries temporelles 
+essayer avec l'echelle l'ogarithmique en ordonnée pour les séries temporelles
 
 #--------------------Rshiny-----------------------
 On peut transformer les analyses en module et apres les integrer dans le Shiny, ca nous permet d'avoir un SHiny plus court
@@ -1169,10 +1170,19 @@ Pou le CAH (shiny) il faut que les couleurs du dendogramme soient les emmes que 
 
 Afficher l'image pour ggpairs parce que ca prend du temps à charger. Rajouter une droite de regression dans le ggpairs
 
+
+
+##----------Conclusion -----------------------
+Comparer la vulnerabilité et l'exposistion - Conclusion
+C'est un choix interne de ne pas se proteger alors que les pays ont la capacité, on a suffisemment d'argent, d'infrastrctures, etc... de nourrir tout le monde et de loger tout le monde 
+Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La masse de l'agriculture pourrait suffir pour les besoins 
+
+
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 
 ```
+
 
 
 
