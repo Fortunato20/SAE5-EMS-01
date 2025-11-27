@@ -1173,6 +1173,9 @@ Afficher l'image pour ggpairs parce que ca prend du temps à charger. Rajouter u
 Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs
 
 ##----------Conclusion -----------------------
+
+on peut identifier les pays avec beaucoup de catastrophe et les pib faible  etc, les pays qui sont en fragilité et en plus exposes on peut dire en conclusion quel sont les pays qui sot plus vulnérable ou les pays qui sont plus expose mais moins vulnérables, et le pays est capables de résisté et s'il ne le font pas c'est un problème en interne, les pays ont un potentielle pour résister au changement climatique mais es ce qu'il le font vraiment? exemple les USA ou bien la France 
+voir aussi les pays qui ne n'ont pas trop de catastrophe il n'ont pas de risque et ont des avantages.
 Comparer la vulnerabilité et l'exposistion - Conclusion
 C'est un choix interne de ne pas se proteger alors que les pays ont la capacité, on a suffisemment d'argent, d'infrastrctures, etc... de nourrir tout le monde et de loger tout le monde 
 Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La masse de l'agriculture pourrait suffir pour les besoins 
@@ -1182,6 +1185,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ```{r}
 
 ```
+
 
 
 
