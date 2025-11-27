@@ -1166,7 +1166,9 @@ Choix : avec le logarithme.
 On peut transformer les analyses en module et apres les integrer dans le Shiny, ca nous permet d'avoir un SHiny plus court
  paackage DT (renderDT pour le tableau des statistiques en SHiny)
 
-La table des statistiques ne s'affiche pas 
+La table des statistiques ne s'affiche pas (ok) 
+
+Mettre les cartes apres les stats descriptives avant les stats bivariées
 
 Pour les ACP, il faut pouvoir choisir le choix des axes pour le cercle de corrélations et le nuage de points egalement
 
@@ -1176,7 +1178,10 @@ Moyennes par classe ne s'affiche pas dans CAH
 
 Afficher l'image pour ggpairs parce que ca prend du temps à charger. Rajouter une droite de regression dans le ggpairs
 
-Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs
+Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs ( dans la partie bivarié, laisser juste la parie ou on a le choix entre x et y )
+
+Les series temporelles ne s'affichent pas pour tous les pays, ca s'affiche pour quatar seulement 
+
 
 ##----------Conclusion -----------------------
 
@@ -1190,6 +1195,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
