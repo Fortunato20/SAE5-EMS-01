@@ -1185,6 +1185,8 @@ Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs ( dans l
 
 On veut les boxplot non stadardisées (on veut avec les valeurs réelles)
 
+Il faut que le tableau des moyennes des CAH change aussi quand on change le nombre de classe 
+
 Les series temporelles ne s'affichent pas pour tous les pays, ca s'affiche pour quatar seulement 
 
 
@@ -1200,6 +1202,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
