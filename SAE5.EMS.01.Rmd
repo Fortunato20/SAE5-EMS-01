@@ -1181,7 +1181,9 @@ Moyennes par classe ne s'affiche pas dans CAH (ok)
 
 Afficher l'image pour ggpairs parce que ca prend du temps à charger. Rajouter une droite de regression dans le ggpairs
 
-Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs ( dans la partie bivarié, laisser juste la parie ou on a le choix entre x et y )
+Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs ( dans la partie bivarié, laisser juste la parie ou on a le choix entre x et y ) (ok)
+
+On veut les boxplot non stadardisées (on veut avec les valeurs réelles)
 
 Les series temporelles ne s'affichent pas pour tous les pays, ca s'affiche pour quatar seulement 
 
@@ -1198,6 +1200,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
