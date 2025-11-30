@@ -1169,25 +1169,23 @@ Choix : avec le logarithme.
 On peut transformer les analyses en module et apres les integrer dans le Shiny, ca nous permet d'avoir un SHiny plus court
  paackage DT (renderDT pour le tableau des statistiques en SHiny)
 
-La table des statistiques ne s'affiche pas (ok) 
+Rajouter une droite de regression dans le ggpairs
 
-Mettre les cartes apres les stats descriptives avant les stats bivariées
-
-Pour les ACP, il faut pouvoir choisir le choix des axes pour le cercle de corrélations et le nuage de points egalement
-
-Pou le CAH (shiny) il faut que les couleurs du dendogramme soient les emmes que ceux de la cartes (pour les classes)
-
-Moyennes par classe ne s'affiche pas dans CAH (ok)
-
-Afficher l'image pour ggpairs parce que ca prend du temps à charger. Rajouter une droite de regression dans le ggpairs
-
-Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs ( dans la partie bivarié, laisser juste la parie ou on a le choix entre x et y ) (ok)
+Les series temporelles ne s'affichent pas pour tous les pays, ca s'affiche pour quatar seulement 
 
 On veut les boxplot non stadardisées (on veut avec les valeurs réelles)
 
-Il faut que le tableau des moyennes des CAH change aussi quand on change le nombre de classe 
 
-Les series temporelles ne s'affichent pas pour tous les pays, ca s'affiche pour quatar seulement 
+La table des statistiques ne s'affiche pas (ok) 
+Mettre les cartes apres les stats descriptives avant les stats bivariées (ok)
+Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs ( dans la partie bivarié, laisser juste la parie ou on a le choix entre x et y ) (ok)
+Moyennes par classe ne s'affiche pas dans CAH (ok)
+Pour le CAH (shiny) il faut que les couleurs du dendogramme soient les memes que ceux des points de la carte associée (pour les classes) (ok)
+Il faut que le tableau des moyennes des CAH change aussi quand on change le nombre de classe (ok)
+Pour les ACP, il faut pouvoir choisir le choix des axes pour le cercle de corrélations et le nuage de points egalement (ok)
+Afficher l'image pour ggpairs parce que ca prend du temps à charger. 
+
+
 
 
 ##----------Conclusion -----------------------
@@ -1202,6 +1200,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
