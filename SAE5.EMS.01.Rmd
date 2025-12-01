@@ -1141,6 +1141,32 @@ L’évolution des surfaces forestières montre des dynamiques très contrastée
 
 Résumé : Cuba montre une progression nette de ses surfaces forestières, le Suriname maintient une couverture exceptionnellement élevée et stable, tandis que le Qatar reste dépourvu de forêt en raison de son climat aride
 
+#CO₂ en échelle logarithmique
+```{r}
+ggplot(serie_CO2_long, aes(x = annee, y = Emissions_CO2, color = Pays)) +
+    geom_line(linewidth = 1) +
+    scale_y_log10() +
+    labs(
+        title = "Évolution des émissions de CO₂ (échelle logarithmique)",
+        x = "Année",
+        y = "Émissions de CO₂ (log)",
+        color = "Pays"
+    ) +
+    theme_minimal()
+```
+#Surface forestière en échelle logarithmique
+```{r}
+ggplot(serie_FOR_long, aes(x = annee, y = Surface_Forestiere, color = Pays)) +
+    geom_line(linewidth = 1) +
+    scale_y_log10() +
+    labs(
+        title = "Évolution des surfaces forestières (échelle logarithmique)",
+        x = "Année",
+        y = "Surface forestière (% - log)",
+        color = "Pays"
+    ) +
+    theme_minimal()
+```
 
 # Faire de la prévision (modélisation) avec la fonction predict
 ```{r}
@@ -1245,6 +1271,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
