@@ -911,22 +911,29 @@ La majorité des pays est concentrée au centre, ce qui veut dire qu’ils ont d
 library(ggplot2)
 library(ggrepel)
 
-# Coordonnées des individus sur les axes 3 et 4
+# Coordonnées des individus sur les axes 1 et 2
 ind_coords <- data.frame(
-  Pays = rownames(acp$ind$coord),
-  Dim3 = acp$ind$coord[,3],
-  Dim4 = acp$ind$coord[,4]
+Pays = rownames(acp$ind$coord),
+Dim1 = acp$ind$coord[,3],
+Dim2 = acp$ind$coord[,4]
 )
-ggplot(ind_coords, aes(x = Dim3, y = Dim4, label = Pays)) +
-  geom_point(color = "blue", alpha = 0.6) +      # points semi-transparents
-  geom_text_repel(size = 3, max.overlaps = 30) + # labels ajustés automatiquement
-  theme_minimal() +
-  labs(
-    title = "Nuage des individus (Axes 3 et 4)",
-    x = "Dim 3",
-    y = "Dim 4"
-  ) +
-  theme(plot.title = element_text(hjust = 0.5))
+
+ggplot(ind_coords, aes(x = Dim1, y = Dim2, label = Pays)) +
+ 
+  # --- AJOUT DES AXES À ZÉRO (x=0 et y=0) ---
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  # ---------------------------------------------
+  
+  geom_point(color = "blue", alpha = 0.6) + # points semi-transparents
+geom_text_repel(size = 3, max.overlaps = 30) + # labels ajustés automatiquement
+theme_minimal() +
+labs(
+title = "Nuage des individus (Axes 1 et 2)",
+x = "Dim 1",
+y = "Dim 2"
+) +
+theme(plot.title = element_text(hjust = 0.5))
 ```
 Sur l’Axe 3, les pays à droite ont une forte croissance du PIB, comme la Guyane, tandis que les pays à gauche ont une croissance faible ou négative, comme l’Ukraine. Cet axe distingue donc surtout les dynamiques économiques.
 
@@ -1213,6 +1220,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
