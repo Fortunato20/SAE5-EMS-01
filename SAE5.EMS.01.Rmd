@@ -1187,6 +1187,7 @@ Les series temporelles ne s'affichent pas pour tous les pays, ca s'affiche pour 
 
 On veut les boxplot non stadardisées (on veut avec les valeurs réelles)
 
+Enlever l'elechelle log dans cartes
 
 La table des statistiques ne s'affiche pas (ok) 
 Mettre les cartes apres les stats descriptives avant les stats bivariées (ok)
@@ -1212,6 +1213,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
