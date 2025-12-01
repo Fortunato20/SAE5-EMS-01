@@ -1214,16 +1214,13 @@ Choix : avec le logarithme.
 
 
 ##|-------------------------Remarques à changer-------------------------------
-- Mettre les vraies valeurs pour les boites à moustaches (ne pas standardiser, on a toujous la meme forme), 
 
-- Rajouter les axes pour les nuages des individus (acp), xintecept peut etre
 
 - Essayer une droite quadratique pour les nuages de points entre 2 indicateurs.
 
-- Verififer la republique centre africaine qui a une esperance de vie tres faible (dans le 2e nuage de points sur analyse croisée)
-Il n'y a pas d'erreur, mais l'esperance de vie varie bcp dans le temps, on s'est arrete en 2022 l'esperance moyenne est de 18 ans, mais en 2023 elle augmente encore.
+- la republique centre africaine qui a une esperance de vie tres faible (dans le 2e nuage de points sur analyse croisée) : Il n'y a pas d'erreur, mais l'esperance de vie varie bcp dans le temps, on s'est arrete en 2022 l'esperance moyenne est de 18 ans, mais en 2023 elle augmente encore
 
-#Le Tchad a l’espérance de vie la plus basse parmi les voisins de la republique centre africaine parcequ'il cumule pauvreté, instabilité, manque d’infrastructures, climat difficile et système de santé très faible
+
 - Table des signes pour les classes (comme vu en 2e annéé) ou alors avec des couleurs 
 
 - Essayer avec l'echelle l'ogarithmique en ordonnée pour les séries temporelles
@@ -1271,6 +1268,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
