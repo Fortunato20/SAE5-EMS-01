@@ -1192,7 +1192,7 @@ On peut transformer les analyses en module et apres les integrer dans le Shiny, 
 
 Rajouter une droite de regression dans le ggpairs
 
-Les series temporelles ne s'affichent pas pour tous les pays, ca s'affiche pour quatar seulement 
+Les series temporelles ne s'affichent pas pour tous les pays, ca s'affiche pour qatar seulement 
 
 On veut les boxplot non stadardisées (on veut avec les valeurs réelles)
 
@@ -1226,6 +1226,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
