@@ -1179,6 +1179,8 @@ Choix : avec le logarithme.
 - Essayer une droite quadratique pour les nuages de points entre 2 indicateurs.
 
 - Verififer la republique centre africaine qui a une esperance de vie tres faible (dans le 2e nuage de points sur analyse croisée)
+Il n'y a pas d'erreur, mais l'esperance de vie varie bcp dans le temps, on s'est arrete en 2022 l'esperance moyenne est de 18 ans, mais en 2023 elle augmente encore.
+
 #Le Tchad a l’espérance de vie la plus basse parmi les voisins de la republique centre africaine parcequ'il cumule pauvreté, instabilité, manque d’infrastructures, climat difficile et système de santé très faible
 - Table des signes pour les classes (comme vu en 2e annéé) ou alors avec des couleurs 
 
@@ -1197,6 +1199,8 @@ On veut les boxplot non stadardisées (on veut avec les valeurs réelles)
 Enlever l'elechelle log dans cartes
 
 Faire le tableau des moyennes des classes avec les variables plutot que les dmensions des acp
+
+Rajouter les previsions dans le shiny
 
 La table des statistiques ne s'affiche pas (ok) 
 Mettre les cartes apres les stats descriptives avant les stats bivariées (ok)
@@ -1222,6 +1226,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
