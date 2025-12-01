@@ -1003,6 +1003,22 @@ Classe 4: (22 pays) : Pays Développés à Risques Naturels.Leur marqueur princi
 Classe 2 :(30 pays) : Pays en Difficulté Sanitaire et Ruraux.Ce groupe est fortement pénalisé par le Taux de Mortalité Infantile (79.11), le plus critique de toutes les classes.Ils ont également une forte proportion d'Agriculture (25.89%) et utilisent beaucoup d'Énergie Renouvelable (76.63%).
 Classe 5: (5 pays) : Outliers Extrêmes et Super-Pollueurs.C'est un petit groupe de pays (5) avec des indicateurs de développement parfaits (100% Électricité, Espérance de Vie la plus haute).Ils sont définis par leurs Émissions de CO2 (25178.72), qui sont cinq fois supérieures à la classe la plus polluante
 
+#Table des signe pour les classes
+```{r}
+res <- round(mparclasse(dACP, cah5), 2)
+
+classes_vals <- res[grep("classe", rownames(res)), ]
+ensemble_vals <- res["Ensemble", ]
+
+sign_table <- t(apply(classes_vals, 1, function(cl){
+  ifelse(cl > ensemble_vals, "+",
+         ifelse(cl < ensemble_vals, "-", "0"))
+}))
+
+sign_table
+
+```
+
 # Carte des pays avec les classes
 
 Fusion des classes avec la carte
@@ -1229,6 +1245,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
