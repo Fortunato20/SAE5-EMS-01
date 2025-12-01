@@ -1186,6 +1186,9 @@ Il n'y a pas d'erreur, mais l'esperance de vie varie bcp dans le temps, on s'est
 
 - Essayer avec l'echelle l'ogarithmique en ordonnée pour les séries temporelles
 
+- Comparer l'évolution des indicateurs avec la moyenne mondiale (series temporelles) 
+
+
 #--------------------Rshiny-----------------------
 On peut transformer les analyses en module et apres les integrer dans le Shiny, ca nous permet d'avoir un SHiny plus court
  paackage DT (renderDT pour le tableau des statistiques en SHiny)
@@ -1226,6 +1229,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
