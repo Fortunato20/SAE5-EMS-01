@@ -380,14 +380,14 @@ Il y'a une minorite de pays qui ont une part de consommation d'energie renouvela
 ```{r}
 library(dplyr)
 
-# Standardisation
-data_scaled <- scale(data_num) # Créer un nouveau jeu de données standardisé
+# 1. Préparation des données réelles
+# data_t est votre jeu de données contenant les indicateurs réels et les pays.
+# On identifie les colonnes numériques (indicateurs) dans data_t.
+# On exclut 'pays' et 'ISO' qui sont les deux premières colonnes non numériques.
+data_num_reel <- data_t[, 3:ncol(data_t)] 
+data_reel_df <- data_t # On utilise data_t directement pour simplifier
 
-# Conversion en data.frame et ajout des pays
-data_scaled_df <- as.data.frame(data_scaled)
-data_scaled_df$pays <- data_t$pays
-
-# Fonction pour extraire min, Q1, mean, Q3, max + pays associés
+# 2. Fonction pour extraire Min, Max et Moyenne + pays associés
 get_stats <- function(df, var) {
  
   x <- df[[var]]
@@ -396,45 +396,50 @@ get_stats <- function(df, var) {
   vmin <- min(x, na.rm = TRUE)
   vmax <- max(x, na.rm = TRUE)
   mean_val <- mean(x, na.rm = TRUE)
- 
+  
   # pays associés
   pmin   <- df$pays[which.min(x)]
   pmax   <- df$pays[which.max(x)]
-  pmean  <- df$pays[which.min(abs(x - mean_val))]
- 
+  # Pays le plus proche de la moyenne
+  pmean  <- df$pays[which.min(abs(x - mean_val))] 
+
   data.frame(
     variable = var,
-    type = c("Min",  "Moyenne",  "Max"),
+    # SEULEMENT Min, Moyenne, Max
+    type = c("Min",  "Moyenne",  "Max"), 
     valeur = c(vmin, mean_val, vmax),
-    pays = c(pmin,  pmean, pmax)
+    pays = c(pmin, pmean, pmax)
   )
 }
 
-# Statistiques pour tous les indicateurs
-indicateurs <- colnames(data_num)
-stats_list <- lapply(indicateurs, function(v) get_stats(data_scaled_df, v))
+# 3. Statistiques pour tous les indicateurs
+indicateurs <- colnames(data_num_reel) 
+stats_list <- lapply(indicateurs, function(v) get_stats(data_reel_df, v))
 stats_all <- do.call(rbind, stats_list)
 
-# --- AFFICHAGE : BOXLOT + POINTS + LABELS ---
+# --- AFFICHAGE : BOXLOT + POINTS + LABELS (avec données réelles) ---
 for (var in indicateurs) {
  
-  boxplot(data_scaled_df[[var]],
+  # Utilisation de data_reel_df (qui est data_t)
+  boxplot(data_reel_df[[var]], 
           main = paste("Distribution de", var),
-          ylab = "Valeur standardisée",
+          ylab = "Valeur Réelle", 
           xlim = c(0.7, 1.8))
-
-  # On sélectionne uniquement les stats du bon indicateur
+  
+  # On sélectionne uniquement les stats du bon indicateur (Min, Moyenne, Max)
   d <- stats_all[stats_all$variable == var, ]
  
   # Points : chaque statistique
+  # L'ordre dans d est : Min, Moyenne, Max (3 points)
   points(rep(1, nrow(d)), d$valeur,
-         pch = c(19, 17, 15, 17, 19),
-         cex = 1.3)
+          pch = c(19, 17, 19), # 3 symboles : Min (cercle), Moyenne (triangle), Max (cercle)
+          bg = c("red", "orange", "red"),
+          cex = 1.3)
  
   # Labels à droite
   text(1.1, d$valeur,
-       labels = paste(d$type, ":", d$pays),
-       pos = 4, cex = 0.75)
+        labels = paste(d$type, ":", d$pays, " (", round(d$valeur, 2), ")"),
+        pos = 4, cex = 0.75)
 }
 ```
 Distribution de croissance_pib (Croissance du PIB): La distribution est étalée vers le haut. La valeur maximale (Max : Guyana) est une valeur aberrante très éloigné du reste des données, indiquant une croissance du PIB exceptionnelle. Le minimum (Min : Ukraine) est également une valeur aberrante significative dans l'autre direction. La majorité des pays ont une croissance du PIB proche de la moyenne globale, mais il existe des cas extrêmes et notables de très forte croissance (Guyana) et de forte contraction (Ukraine). 
@@ -874,20 +879,27 @@ library(ggrepel)
 
 # Coordonnées des individus sur les axes 1 et 2
 ind_coords <- data.frame(
-  Pays = rownames(acp$ind$coord),
-  Dim1 = acp$ind$coord[,1],
-  Dim2 = acp$ind$coord[,2]
+Pays = rownames(acp$ind$coord),
+Dim1 = acp$ind$coord[,1],
+Dim2 = acp$ind$coord[,2]
 )
+
 ggplot(ind_coords, aes(x = Dim1, y = Dim2, label = Pays)) +
-  geom_point(color = "blue", alpha = 0.6) +      # points semi-transparents
-  geom_text_repel(size = 3, max.overlaps = 30) + # labels ajustés automatiquement
-  theme_minimal() +
-  labs(
-    title = "Nuage des individus (Axes 1 et 2)",
-    x = "Dim 1",
-    y = "Dim 2"
-  ) +
-  theme(plot.title = element_text(hjust = 0.5))
+ 
+  # --- AJOUT DES AXES À ZÉRO (x=0 et y=0) ---
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  # ---------------------------------------------
+  
+  geom_point(color = "blue", alpha = 0.6) + # points semi-transparents
+geom_text_repel(size = 3, max.overlaps = 30) + # labels ajustés automatiquement
+theme_minimal() +
+labs(
+title = "Nuage des individus (Axes 1 et 2)",
+x = "Dim 1",
+y = "Dim 2"
+) +
+theme(plot.title = element_text(hjust = 0.5))
 ```
 #Avec geom_text_repel(), les labels ne se chevauchent presque jamais et on peut identifier facilement les pays concentrés au centre.
 Sur l’Axe 1, on voit deux groupes opposés : d’un côté, les pays avec bonne espérance de vie, beaucoup d’électricité, plus de CO₂, donc généralement plus développés ;de l’autre, les pays avec forte mortalité infantile, forte croissance démographique, agriculture dominante et plus de renouvelables.Les pays très à droite comme (la Centrafrique, Somalie, Niger,ect... )sont clairement ceux avec les plus grosses difficultés.                                                     
@@ -1200,6 +1212,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
