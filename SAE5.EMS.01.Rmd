@@ -1196,6 +1196,8 @@ On veut les boxplot non stadardisées (on veut avec les valeurs réelles)
 
 Enlever l'elechelle log dans cartes
 
+Faire le tableau des moyennes des classes avec les variables plutot que les dmensions des acp
+
 La table des statistiques ne s'affiche pas (ok) 
 Mettre les cartes apres les stats descriptives avant les stats bivariées (ok)
 Enlever l'exemple pret à l'emploi pour le nuage entre deux indicateurs ( dans la partie bivarié, laisser juste la parie ou on a le choix entre x et y ) (ok)
@@ -1220,6 +1222,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
