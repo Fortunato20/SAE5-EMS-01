@@ -1170,29 +1170,46 @@ ggplot(serie_FOR_long, aes(x = annee, y = Surface_Forestiere, color = Pays)) +
 
 # Faire de la prévision (modélisation) avec la fonction predict
 ```{r}
-# 1. Préparer les données pour la France
-data_FRA <- serie_FOR_long %>% 
-    filter(Pays == "FOR_FRA") %>%
+library(dplyr)
+# --- CODE DE PRÉVISION CORRIGÉ (Exemple avec le Suriname) ---
+
+# 1. Préparer les données pour le Suriname
+# **CHANGEMENT CLÉ : Utiliser "Suriname" au lieu de "FOR_FRA"**
+data_SUR <- serie_FOR_long %>% 
+    filter(Pays == "Suriname") %>%
     select(annee, Surface_Forestiere)
 
+# NOUVEAU : Supprimer les lignes où 'annee' OU 'Surface_Forestiere' est NA
+# (Bien que vous ayez vérifié que sum(is.na) = 0, cette étape est bonne pratique)
+data_SUR <- na.omit(data_SUR) 
+
+# VÉRIFICATION
+cat("Nombre de lignes utilisables pour le Suriname :", nrow(data_SUR), "\n")
+if (nrow(data_SUR) == 0) {
+    stop("Erreur: Aucune donnée valide n'a été trouvée pour le Suriname.")
+}
+
+
 # 2. Entraîner le modèle de régression linéaire (lm)
-# Le modèle essaie de trouver la relation : Surface_Forestiere = a * annee + b
-modele_FRA <- lm(Surface_Forestiere ~ annee, data = data_FRA)
+modele_SUR <- lm(Surface_Forestiere ~ annee, data = data_SUR)
 
 # Créer un nouveau data.frame avec les années à prédire
-nouvelles_annees <- data.frame(annee = 2023:2025)
+nouvelles_annees <- data.frame(annee = 2023:2030)
+
 # Effectuer la prévision
-predictions_FRA <- predict(
-    object = modele_FRA,        # Le modèle entraîné (lm dans cet exemple)
-    newdata = nouvelles_annees  # Les données pour lesquelles on veut prédire
-)
-# Combiner les prévisions avec les années
-resultat_prevision <- data.frame(
-    annee = nouvelles_annees$annee, 
-    Surface_Forestiere_Predite = predictions_FRA
+predictions_SUR <- predict(
+    object = modele_SUR,      
+    newdata = nouvelles_annees  
 )
 
-print(resultat_prevision)
+# Combiner les prévisions avec les années
+resultat_prevision_SUR <- data.frame(
+    annee = nouvelles_annees$annee, 
+    Surface_Forestiere_Predite = predictions_SUR
+)
+
+cat("\nPrévisions de surface forestière pour le Suriname (2023-2025):\n")
+print(resultat_prevision_SUR)
 ```
 
 
@@ -1268,6 +1285,7 @@ Mais c'est un choix politique de ne pas le faire, l'argent va autre part.La mass
 ## ---------------------------------- Rshiny ---------------------------------- ##
 ```{r}
 ```
+
 
 
 
